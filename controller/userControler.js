@@ -1,10 +1,18 @@
 const asyncHandler = require('../middleware/asynchandller');
 const userModel = require('../model/userModel');
-
-
+const  transporteur =require('../model/transportorModel')
+const fs = require("fs");
+// updating user data name email
 
 exports.updateUserDetails= asyncHandler(async(req, res , next) => {
- 
+   
+   if(req.body.password){
+    return res.status(400).send({
+      success : false ,
+      message : "You can't update password from here",
+      data : []
+    });
+   }
   
   if (!req.body){
     return res.status(400).send({
@@ -14,7 +22,10 @@ exports.updateUserDetails= asyncHandler(async(req, res , next) => {
     });
   }
 
-  const user = await userModel.findByIdAndUpdate(req.body);
+  const user = await userModel.findByIdAndUpdate(req.body,
+    {
+      runvalidate : true , 
+      new : true});
 
   if(!user){
 
@@ -34,3 +45,111 @@ exports.updateUserDetails= asyncHandler(async(req, res , next) => {
 
 
 });
+
+
+// uploading a profile picture
+
+exports.uploadProfilePicture = asyncHandler(async(req, res, next) => {
+const file = req.files.file;
+ 
+  
+   if(!file){
+    return res.status(400).send({
+      success : false ,
+      message : "Please upload a file",
+      data : []
+    });
+   }
+  
+   if(file.size> 1000000){
+    return res.status(400).send({
+      success : false ,
+      message : "File size should not exceed 1MB",
+      data : []
+    });
+   }
+
+   if(file.mimetype.startsWith("image")){
+    return res.status(400).send({
+      success : false ,
+      message : "Please upload an image file  ex : jpg, jpeg, png",
+      data : []
+    });
+   }
+     
+   // upload the new profile picture on the serveur 
+   file.name = `photo_${req.user.id}${path.parse(file.name).ext}`;
+    file.mv(
+    `./images/private/users/${file.name}`,
+     
+    );
+
+
+       // if the user have a profile picture already delete it from the serveur 
+    if(req.user.profilePicture !== "default.png"){
+      fs.unlink(`./images/private/users/${req.user.profilePicture}`, (err) => {
+        if (err) {
+          console.error(err)
+          return  res.status(400).send({
+            success : false ,
+            message : "error updating profile picture",
+            data : []
+          });
+        }
+      });
+  
+  
+  
+     }
+
+      // updating the new profile picture in the database 
+    const user = await userModel.findByIdAndUpdate(
+      req.user.id,
+      {profilePicture : file.name},
+      {
+        runvalidate : true , 
+        new : true
+      }
+      );
+
+
+
+
+
+
+
+});
+
+
+// get all transporteurs from the database 
+
+exports.getallTransportors = asyncHandler(async(req, res, next) => {
+
+
+  const transportors = await transporteurs.find();
+
+
+   if(!transportors){
+     return res.status(404).send({
+       success : false ,
+       message : "No transportors found",
+       data : []
+     });
+   }
+
+
+   return res.status(200).send({
+     success : true ,
+     message : "Transportors found",
+     data : transportors
+   });
+
+
+
+});
+
+  
+
+
+
+

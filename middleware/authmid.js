@@ -1,11 +1,11 @@
-const usermodel = require('../model/userModel');
+
 const asynchandller = require("../middleware/asynchandller");
 const jwt = require("jsonwebtoken");
 
 
 
 
-const protect = asynchandller(async(req, res, next)=>{
+const protect = (model)=> asynchandller(async(req, res, next)=>{
   
 
   let token ;
@@ -22,13 +22,10 @@ const protect = asynchandller(async(req, res, next)=>{
        data : []
     })
   }
-
-
-
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await usermodel.findOne({
+    const user = await model.findOne({
       id: decoded.id
     });
 
@@ -52,16 +49,7 @@ const protect = asynchandller(async(req, res, next)=>{
       success : false ,
       message : "Error in the server",
       data : [],
-  }
-
-
-
-
-
-
-
-
-
-
-
-}) 
+     })
+   }
+}
+) 

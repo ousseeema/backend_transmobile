@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const bcrypt = require('bcrypt');
 const TransporteurModel = mongoose.Schema({
 
   fullName : 
@@ -96,12 +96,29 @@ const TransporteurModel = mongoose.Schema({
   },
 
 
+  createdAt:{
+    type: Date,
+    default : Date.now
+   },
+    verification_code :{
+    type : String , 
+    default : undefined,
+    required : false ,
+  }
+ 
 
 
 
 
 
+});
+TransporteurModel.pre("save", async function(next){
 
+
+  if(!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, "westudySG");
+  next();
 });
 
 module.exports = mongoose.model("transporteur", userModel);

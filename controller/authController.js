@@ -70,7 +70,7 @@ exports.sign_up_1 = (model) =>
     });
   });
 
-exports.sign_up_2 = (model) =>
+ exports.sign_up_2 = (model) =>
   asynchandler(async (req, res, next) => {
     const valide_user = model.findOne({
       verification_code: req.body.verification_code,
@@ -90,7 +90,7 @@ exports.sign_up_2 = (model) =>
     // if verification code is correct but the time has passedout delete the user and 
     // send a response back to the user to create another account
 
-    if(user.verification_code_expire < Date.now()) {
+    if(valide_user.verification_code_expire < Date.now()) {
 
       const delete_user = await model.findOneAndDelete({
         verification_code: req.body.verification_code
@@ -135,12 +135,6 @@ exports.sign_up_2 = (model) =>
       });
       
     }
-
-
-
-
-
- 
 
 
 

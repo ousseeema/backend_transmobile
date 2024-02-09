@@ -100,6 +100,12 @@ const userModel = mongoose.Schema({
     default : undefined,
     required : false ,
   }
+  ,
+  verification_code_expire :{
+    type : Date, 
+    default : undefined,
+  }
+
 
 });
 

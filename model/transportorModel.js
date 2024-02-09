@@ -104,6 +104,10 @@ const TransporteurModel = mongoose.Schema({
     type : String , 
     default : undefined,
     required : false ,
+  },
+  verification_code_expire :{
+    type : Date, 
+    default : undefined,
   }
  
 

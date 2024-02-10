@@ -124,5 +124,9 @@ TransporteurModel.pre("save", async function(next){
   this.password = await bcrypt.hash(this.password, "westudySG");
   next();
 });
+userModel.methods.matchPassword = function(password){
+  return bcrypt.compare(password, this.password);
+
+}
 
 module.exports = mongoose.model("transporteur", TransporteurModel);

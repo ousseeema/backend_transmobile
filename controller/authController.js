@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const asynchandler = require("../middleware/asynchandller");
 const sendemail = require("../utils/mailtrapper");
 const crypto = require("crypto");
+const jwt = require('jsonwebtoken')
 
 exports.sign_up_1 = (model) =>
   asynchandler(async (req, res, next) => {
@@ -70,7 +71,7 @@ exports.sign_up_1 = (model) =>
     });
   });
 
- exports.sign_up_2 = (model) =>
+exports.sign_up_2 = (model) =>
   asynchandler(async (req, res, next) => {
     const valide_user = model.findOne({
       verification_code: req.body.verification_code,
@@ -87,19 +88,19 @@ exports.sign_up_1 = (model) =>
       });
     }
 
-    // if verification code is correct but the time has passedout delete the user and 
+    // if verification code is correct but the time has passedout delete the user and
     // send a response back to the user to create another account
 
-    if(valide_user.verification_code_expire < Date.now()) {
-
+    if (valide_user.verification_code_expire < Date.now()) {
       const delete_user = await model.findOneAndDelete({
-        verification_code: req.body.verification_code
+        verification_code: req.body.verification_code,
       });
-      
+
       return res.status(400).send({
         status: "Date has expired",
         success: false,
-        message: "verification code expired, try creating another account again",
+        message:
+          "verification code expired, try creating another account again",
         data: [],
         token: null,
       });
@@ -108,33 +109,98 @@ exports.sign_up_1 = (model) =>
     // if the verification code is correct and the time has not expired then  create a token for the user
 
     try {
-    user.verification_code = undefined;
-    user.verification_code_expire = undefined;
-    user.save({
-      validateBeforeSave: false
-    });
+      user.verification_code = undefined;
+      user.verification_code_expire = undefined;
+      user.save({
+        validateBeforeSave: false,
+      });
 
-    const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {
-      expiresIn: "15d"
-    });
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "15d",
+      });
 
-    return res.status(200).send({
-      status: "success",
-      success: true,
-      message: "You are verified successfully",
-      data: user,
-      token: token
-    });
+      return res.status(200).send({
+        status: "success",
+        success: true,
+        message: "You are verified successfully",
+        data: user,
+        token: token,
+      });
     } catch (err) {
       return res.status(500).send({
         status: "fail",
         success: false,
         message: "unable to create account due to server error",
         data: [],
-        token: null
+        token: null,
       });
-      
     }
+  });
+
+exports.signin = (model) =>
+  asynchandler(async (req, res, next) => {
+    const { email, password } = req.body;
+    // testing if the client/transporteur already has typed information
+    if (!email || !password) {
+      return res.status(400).send({
+        status: "fail",
+        success: false,
+        message: "invalid credentials",
+        data: [],
+        token: null,
+      });
+    }
+
+    const user = await model.findOne({ email: email }).select("+password");
+
+    if (!user) {
+      return res.status(400).send({
+        status: "fail",
+        success: false,
+        message: "invalid creadentials",
+        data: [],
+        token: null,
+      });
+    }
+
+    const isMatched = await user.matchPassword(user.password);
+
+    if (!isMatched) {
+      return res.status(400).send({
+        status: "fail",
+        success: false,
+        message: "invalid creadentials",
+        data: [],
+        token: null,
+      });
+    }
+try {
+  
+  const Token = await jwt.sign({id : user._id}, process.env.JWT_SECRET);
+   return res.status(200).send({
+        status: "success",
+        success: true,
+        message: "you are logged in",
+        data: user,
+        token: Token,
+      });
+  
+
+  
+} catch (
+  err
+) {
+  
+  return res.status(500).send({
+        status: "fail",
+        success: false,
+        message: "unable to create account due to server error",
+        data: [],
+        token: null,
+      });
+}
+
+    
 
 
 

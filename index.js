@@ -40,8 +40,8 @@ const transporteursRoute = require('./routes/transporteurRoute');
 app.use("/api/v0/transporteurs", transporteursRoute);
 
 // auth Routes 
-//const authRoutes = require("./routes/authRoute");
-//app.use("/api/v0/auth", authRoutes);
+const authRoutes = require("./routes/authRoute");
+app.use("/api/v0/auth", authRoutes);
 
  
 

@@ -119,4 +119,9 @@ userModel.pre("save", async function(next){
   next();
 });
 
+userModel.methods.matchPassword = function(password){
+  return bcrypt.compare(password, this.password);
+
+}
+
 module.exports = mongoose.model("user", userModel);

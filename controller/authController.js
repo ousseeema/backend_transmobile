@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+
 const asynchandler = require("../middleware/asynchandller");
 const sendemail = require("../utils/mailtrapper");
 const crypto = require("crypto");

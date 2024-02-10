@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const TransporteurModel = mongoose.Schema({
 
   fullName : 
@@ -125,4 +125,4 @@ TransporteurModel.pre("save", async function(next){
   next();
 });
 
-module.exports = mongoose.model("transporteur", userModel);
+module.exports = mongoose.model("transporteur", TransporteurModel);

@@ -2,7 +2,7 @@ const cron = require('node-cron');
 
 // Fonction pour supprimer automatiquement les comptes expirés
 function autoDeleteExpiredUsers(model) {
-  cron.schedule('0 0 * * *', async () => {
+  cron.schedule('*/16 * * * *', async () => {
     try {
       // Trouver tous les comptes dont la date d'expiration est dépassée
       const expiredUsers = await model.find({

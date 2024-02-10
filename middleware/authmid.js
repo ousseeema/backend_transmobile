@@ -4,8 +4,7 @@ const jwt = require("jsonwebtoken");
 
 
 
-
-const protect = (model)=> asynchandller(async(req, res, next)=>{
+exports.protect = (model)=> asynchandller(async(req, res, next)=>{
   
 
   let token ;

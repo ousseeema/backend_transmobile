@@ -3,18 +3,11 @@ const jwt = require("jsonwebtoken");
 const asynchandler = require("../middleware/asynchandller");
 const sendemail = require("../utils/mailtrapper");
 const crypto = require("crypto");
-const jwt = require('jsonwebtoken')
+
 
 exports.sign_up_1 = (model) =>
   asynchandler(async (req, res, next) => {
-    if (!(req.fullname && req.password && req.email)) {
-      return res.status(400).json({
-        status: "fail",
-        message: "please provide username, password and email address",
-        data: [],
-        token: null,
-      });
-    }
+   
 
     const user = await model.create(req.body);
 
@@ -44,7 +37,7 @@ exports.sign_up_1 = (model) =>
     };
 
     // sending the email
-    sendemail(options).catch((err) => {
+   await  sendemail(options).catch((err) => {
       console.log(err);
       return res.status(500).send({
         status: "fail",
@@ -153,7 +146,7 @@ exports.signin = (model) =>
 
     const user = await model.findOne({ email: email }).select("+password");
 
-    if (!user) {
+    if (!user){
       return res.status(400).send({
         status: "fail",
         success: false,
@@ -206,3 +199,5 @@ try {
 
 
   });
+
+  // todo: implement reset passsword end point , forgotpassword end point

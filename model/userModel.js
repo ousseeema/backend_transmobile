@@ -85,17 +85,16 @@ const userModel = mongoose.Schema({
 
   createdAt:{
     type: Date,
-    default : Date.now
+    default : Date.now()
    },
   verification_code :{
     type : String , 
-    default : undefined,
-    required : false ,
+    
+    
   }
   ,
   verification_code_expire :{
     type : Date, 
-    default : undefined,
   }
 
 

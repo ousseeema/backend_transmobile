@@ -37,16 +37,7 @@ exports.sign_up_1 = (model) =>
     };
 
     // sending the email
-   await  sendemail(options).catch((err) => {
-      console.log(err);
-      return res.status(500).send({
-        status: "fail",
-        success: false,
-        message: "unable to send verification email",
-        data: [],
-        token: null,
-      });
-    });
+   await sendemail(options);
 
     // updating the user with the verification code and time to expire
     user.verification_code = verification_code;
@@ -66,14 +57,15 @@ exports.sign_up_1 = (model) =>
 
 exports.sign_up_2 = (model) =>
   asynchandler(async (req, res, next) => {
-    const valide_user = model.findOne({
+    const user = await model.findOne({
       verification_code: req.body.verification_code,
     });
 
     // if verification code is not valid the user will have the chance to re enter the code
-    if (!valide_user) {
+    if (!user) {
       return res.status(400).send({
         status: "error in the code",
+
         success: false,
         message: "invalid verification code, try again",
         data: [],
@@ -84,7 +76,7 @@ exports.sign_up_2 = (model) =>
     // if verification code is correct but the time has passedout delete the user and
     // send a response back to the user to create another account
 
-    if (valide_user.verification_code_expire < Date.now()) {
+    if (user.verification_code_expire < Date.now()) {
       const delete_user = await model.findOneAndDelete({
         verification_code: req.body.verification_code,
       });
@@ -99,35 +91,29 @@ exports.sign_up_2 = (model) =>
       });
     }
 
-    // if the verification code is correct and the time has not expired then  create a token for the user
+    
 
-    try {
-      user.verification_code = undefined;
-      user.verification_code_expire = undefined;
-      user.save({
-        validateBeforeSave: false,
-      });
-
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+   
+        //creating jwt token for the logged user
+      const token = jwt.sign({ id: user._id }, "zui87fze69f8z9f7zef74ef", {
         expiresIn: "15d",
       });
+    // if the verification code is correct and the time has not expired then  remove the verification code and the
+    // time to expire from the account info
+    const newuser  = await model.findOneAndUpdate(user._id,{
+      $unset: { [verification_code]: 1 , [verification_code_expire]: 1}
+      });
+
 
       return res.status(200).send({
         status: "success",
         success: true,
         message: "You are verified successfully",
-        data: user,
+        data: newuser,
         token: token,
       });
-    } catch (err) {
-      return res.status(500).send({
-        status: "fail",
-        success: false,
-        message: "unable to create account due to server error",
-        data: [],
-        token: null,
-      });
-    }
+    
+    
   });
 
 exports.signin = (model) =>
@@ -169,7 +155,7 @@ exports.signin = (model) =>
     }
 try {
   
-  const Token = await jwt.sign({id : user._id}, process.env.JWT_SECRET);
+  const Token =  jwt.sign({id : user._id}, process.env.JWT_SECRET);
    return res.status(200).send({
         status: "success",
         success: true,

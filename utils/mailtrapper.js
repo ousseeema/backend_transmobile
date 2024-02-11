@@ -1,15 +1,15 @@
 const mailer = require('nodemailer');
 
 
-const sendemail = async (options)=>(req, res, next)=>{
+const sendemail = async (options)=>{
   
  var transport = mailer.createTransport(
   {
     host: "sandbox.smtp.mailtrap.io",
     port: 2525,
     auth: {
-         user: process.env.maileruser,
-         pass: process.env.mailerpass
+         user:  "ed6990159e4dcc",
+         pass: "86d8b94f6b7505"
             }
       
   }
@@ -17,14 +17,22 @@ const sendemail = async (options)=>(req, res, next)=>{
 
  const message = {
   form: `WeStudySG@gmail.com`,
-  to : options.emailto,
-  subject: options.subject,
-  text : options.text
+  to:"oussema@gmail.com",
+  subject:options.subject,
+  text: options.text
  }
 
 
 
- const info = transport.sendMail(message);
+
+ const info = await transport.sendMail(message,(error, info) => {
+  if (error) {
+    console.error('Error occurred:', error);
+  } else {
+    console.log('Email sent:', info.response);
+  }
+  
+});
 
    
 

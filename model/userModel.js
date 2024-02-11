@@ -8,7 +8,7 @@ const userModel = mongoose.Schema({
 
 
 
-  fullName : 
+  fullname : 
   {
   type : String,
    required : [true, "Please enter your full name"] ,
@@ -16,15 +16,7 @@ const userModel = mongoose.Schema({
    unique : false,
 
   }, 
-  CarteNumber : {
-    type : String,
-    required :false ,
-    trim : true ,
-    unique : true,
-    maxlength : 16,
-    minlength : 16,
-
-  },
+ 
   email :{
     type : String,
     required : [true, "Please enter your email"] ,
@@ -114,8 +106,8 @@ userModel.pre("save", async function(next){
 
 
   if(!this.isModified("password")) return next();
-
-  this.password = await bcrypt.hash(this.password, "westudySG");
+  const gensalt =await bcrypt.genSalt(10)
+  this.password = await bcrypt.hash(this.password,gensalt);
   next();
 });
 

@@ -32,19 +32,31 @@ deletePlanifier(transportModel);
 
 
 // clients routes 
-const clientsRoute = require('./routes/userRoute');
+const clientsRoute = require('./routes/users/userRoute');
 app.use("/api/v0/clients", clientsRoute);
 
 // transporteurs routes
-const transporteursRoute = require('./routes/transporteurRoute');
+const transporteursRoute = require('./routes/users/transporteurRoute');
 app.use("/api/v0/transporteurs", transporteursRoute);
 
-// auth Routes 
-const authRoutes = require("./routes/authRoute");
-app.use("/api/v0/auth", authRoutes);
 
- 
 
+
+// auth Client Routes 
+const authClientRoutes = require("./routes/auth/authClientsRoute");
+app.use("/api/v0/authClient", authClientRoutes);
+// auth Transporteur Routes
+const authTransporteurRoutes = require("./routes/auth/authTransporteurRoutes");
+app.use("/api/v0/authTransporteur", authTransporteurRoutes);
+
+
+
+
+
+
+ // error middleware import and use 
+ const errorMiddleware= require('./middleware/errormid');
+app.use(errorMiddleware);
 
 
 // connecting to the database

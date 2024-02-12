@@ -17,7 +17,7 @@ const sendemail = async (options)=>{
 
  const message = {
   form: `WeStudySG@gmail.com`,
-  to:"oussema@gmail.com",
+  to:options.emailto,
   subject:options.subject,
   text: options.text
  }

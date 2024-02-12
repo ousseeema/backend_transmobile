@@ -31,6 +31,13 @@ const userModel = mongoose.Schema({
 
 
   },
+  Phoen_Number:{
+     type : String ,
+      required : [true, "Please enter your phone number"] ,
+      trim : true ,
+      maxlength : [20,'Phone number can not be longer than 20 characters'],
+      minlength:[8,'Phone number can not be longer than 8 characters'],
+  },
 
   password : {
     type : String,
@@ -61,7 +68,14 @@ const userModel = mongoose.Schema({
     trim : true ,
     unique : false,
   },
-  LocalAdresse : {
+  destine_City:{
+    type : String,
+
+    required : true,
+    trim : true ,
+    unique : false,
+  },
+  country : {
     type : String,
     default : "",
     required : false,

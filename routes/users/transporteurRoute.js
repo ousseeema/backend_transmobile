@@ -6,7 +6,6 @@ const transporteur= require("../../model/transportorModel")
 const {updateUserDetails,uploadProfilePicture }= require("../../controller/transporteurController")
 
 
-
 router.route("/updateTransporteurDetails").put(protect(transporteur), updateUserDetails);
 router.route("/uploadProfilePicture").post(protect(transporteur), uploadProfilePicture);
 module.exports = router;

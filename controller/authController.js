@@ -3,12 +3,9 @@ const jwt = require("jsonwebtoken");
 const asynchandler = require("../middleware/asynchandller");
 const sendemail = require("../utils/mailtrapper");
 const crypto = require("crypto");
-
-
+const secret ="zui87fze69f8z9f7zef74ef";
 exports.sign_up_1 = (model) =>
   asynchandler(async (req, res, next) => {
-   
-
     const user = await model.create(req.body);
 
     if (!user) {
@@ -23,7 +20,7 @@ exports.sign_up_1 = (model) =>
     // sending a verification email to the user
 
     //creating a random number from 15 octets then converting it to hexadecimal and hashing it to sha256 then converting it to hexadecimal
-    const random_number = crypto.randomBytes(15).toString("hex");
+    const random_number = crypto.randomBytes(5).toString("hex");
     const verification_code = crypto
       .createHash("sha256")
       .update(random_number)
@@ -31,13 +28,21 @@ exports.sign_up_1 = (model) =>
 
     // options to pass to the sendemail function
     const options = {
-      emailto: req.email,
+      emailto: req.body.email,
       subject: "Account Verification",
-      text: `dear ${req.fullname} enter this code to verifie your email ${verification_code}`,
+      text: `dear ${req.body.fullname} enter this code to verifie your email ${verification_code}`,
     };
 
     // sending the email
-   await sendemail(options);
+    await sendemail(options).catch((err) => {
+      return res.status(500).send({
+        status: "fail",
+        success: false,
+        message: "unable to send verification code",
+        data: [],
+        token: null,
+      });
+    });
 
     // updating the user with the verification code and time to expire
     user.verification_code = verification_code;
@@ -48,10 +53,11 @@ exports.sign_up_1 = (model) =>
 
     // if all of the work is done successfully then send a response to the user
     return res.status(200).send({
-      message: "check your email to verify your account",
+      message: "Check your email to verify your account",
       success: true,
       data: [],
       token: null,
+     
     });
   });
 
@@ -91,29 +97,27 @@ exports.sign_up_2 = (model) =>
       });
     }
 
-    
-
-   
-        //creating jwt token for the logged user
-      const token = jwt.sign({ id: user._id }, "zui87fze69f8z9f7zef74ef", {
-        expiresIn: "15d",
-      });
+    //creating jwt token for the logged user
+    const token = jwt.sign({ id: user._id }, secret, {
+      expiresIn: "15d",
+    });
     // if the verification code is correct and the time has not expired then  remove the verification code and the
     // time to expire from the account info
-    const newuser  = await model.findOneAndUpdate(user._id,{
-      $unset: { [verification_code]: 1 , [verification_code_expire]: 1}
-      });
+    const newuser = await model.findOneAndUpdate(
+      user._id,
+      {
+        $unset: { verification_code: 1, verification_code_expire: 1 },
+      },
+      { new: true }
+    );
 
-
-      return res.status(200).send({
-        status: "success",
-        success: true,
-        message: "You are verified successfully",
-        data: newuser,
-        token: token,
-      });
-    
-    
+    return res.status(200).send({
+      status: "success",
+      success: true,
+      message: "You are verified successfully",
+      data: newuser,
+      token: token,
+    });
   });
 
 exports.signin = (model) =>
@@ -124,7 +128,7 @@ exports.signin = (model) =>
       return res.status(400).send({
         status: "fail",
         success: false,
-        message: "invalid credentials",
+        message: "Invalid credentials",
         data: [],
         token: null,
       });
@@ -132,7 +136,7 @@ exports.signin = (model) =>
 
     const user = await model.findOne({ email: email }).select("+password");
 
-    if (!user){
+    if (!user) {
       return res.status(400).send({
         status: "fail",
         success: false,
@@ -142,7 +146,7 @@ exports.signin = (model) =>
       });
     }
 
-    const isMatched = await user.matchPassword(user.password);
+    const isMatched = await user.matchPassword(password);
 
     if (!isMatched) {
       return res.status(400).send({
@@ -153,37 +157,159 @@ exports.signin = (model) =>
         token: null,
       });
     }
-try {
-  
-  const Token =  jwt.sign({id : user._id}, process.env.JWT_SECRET);
-   return res.status(200).send({
+    try {
+      const Token = jwt.sign({ id: user._id },secret);
+      return res.status(200).send({
         status: "success",
         success: true,
         message: "you are logged in",
         data: user,
         token: Token,
       });
-  
-
-  
-} catch (
-  err
-) {
-  
-  return res.status(500).send({
+    } catch (err) {
+      return res.status(500).send({
         status: "fail",
         success: false,
         message: "unable to create account due to server error",
         data: [],
         token: null,
       });
-}
+    }
+  });
 
+// todo: implement reset passsword end point , forgotpassword end point
+
+exports.forgotpassword = (model) => asynchandler(async (req, res, next) => {
+
+   const {email} = req.body;
+
+
+   const user = await model.findOne({ email: email });
+
+    if (!user) {
+      return res.status(400).send({
+        status: "fail",
+        success: false,
+        message: "invalid creadentials",
+        data: [],
+        token: null,
+      });
+    }
+
+
+    const randomNumber = crypto.randomBytes(2).toString("hex");
+    const resetToken = crypto.createHash("sha256").update(randomNumber).digest("hex"); 
+
+  const message ={
+    emailto: email,
+    subject: "Password Reset",
+    text: `Your password reset token is ${resetToken}`
+  }
+
+  try {
+    await sendemail(message);
+     user.resetToken = resetToken;
+     user.resetTokenExpire = Date.now() + 10 * 60 * 1000;
+     user.save({
+      validateBeforeSave: false,
+     });
+
+    return res.status(200).send({
+      status: "success",
+      success: true,
+      message: "reset token sent to your email",
+      data: [],
+      token: null,
+    });
+  } catch (err) {
+    user.resetToken = undefined;
+    user.resetTokenExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+    return res.status(500).send({
+      status: "fail",
+      success: false,
+      message: "unable to send email",
+      data: [],
+      token: null,
+    });
     
-
+  }
 
 
 
   });
 
-  // todo: implement reset passsword end point , forgotpassword end point
+
+
+  exports.resetoassword = (model)=>asynchandler(async(req, res, next )=>{
+
+ 
+     const {
+      newpassword, 
+      resettoken 
+     } = req.body;
+     const user = await model.findOne({resetToken: resettoken, 
+      
+    }).select("+password");
+    if(!user){
+      return res.status(404).send({
+        status: "fail",
+        success: false,
+        message: "invalid token",
+        data: [],
+        token: null,
+      
+      });
+    }
+
+    if(user.resetTokenExpire<Date.now()){
+      return res.status(404).send({
+        status: "fail",
+        success: false,
+        message: "token expired",
+        data: [],
+        token: null,
+      
+      });
+    }
+
+
+   try {
+    user.password = newpassword;
+    user.resetToken = undefined;
+    user.resetTokenExpire = undefined;
+    const logedToken = await jwt.sign({id : user._id, secret})
+    await user.save({
+      validateBeforeSave: true,
+    });
+
+    return res.status(200).send({
+      status: "success",
+      success: true,
+      message: "password reset successfully",
+      data: user,
+      token: logedToken,
+    });
+    
+   } catch (err) {
+
+    user.resetToken = undefined;
+    user.resetTokenExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+    return res.status(500).send({
+      status: "fail",
+      success: false,
+      message: "unable to reset password",
+      data: [],
+      token: null,
+    });
+    
+   }
+
+  });
+  
+
+
+
+
+

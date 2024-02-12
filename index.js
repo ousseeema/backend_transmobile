@@ -18,8 +18,8 @@ const connectDB = require("./config/database");
 app.use(express.json());
 
 
-
-
+const uploadfile = require("express-fileupload")
+app.use(uploadfile());
 
 // importing automatic delete functions for user and transporteur accounts
 const deletePlanifier = require("./utils/deletePlanifie");  

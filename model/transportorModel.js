@@ -203,6 +203,10 @@ Profil_Picture : {
     trim : true ,
     unique : false,
   },
+  Role:{
+  type : String,
+  default : 'Transporter',
+  },
 
   totalRevenue : {
     type : Number,

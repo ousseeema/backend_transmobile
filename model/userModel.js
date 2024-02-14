@@ -46,6 +46,10 @@ const userModel = mongoose.Schema({
     unique : false,
     select : false,
   },
+  Role:{
+    type : String,
+    default : 'Client',
+    },
 
   numberofClients : {
     type : Number,

@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const asynchandler = require("../middleware/asynchandller");
 const sendemail = require("../utils/mailtrapper");
 const crypto = require("crypto");
-const secret ="zui87fze69f8z9f7zef74ef";
+const secret = "zui87fze69f8z9f7zef74ef";
 exports.sign_up_1 = (model) =>
   asynchandler(async (req, res, next) => {
     const user = await model.create(req.body);
@@ -20,11 +20,9 @@ exports.sign_up_1 = (model) =>
     // sending a verification email to the user
 
     //creating a random number from 15 octets then converting it to hexadecimal and hashing it to sha256 then converting it to hexadecimal
-    const random_number = crypto.randomBytes(5).toString("hex");
-    const verification_code = crypto
-      .createHash("sha256")
-      .update(random_number)
-      .digest("hex");
+    const random = crypto.randomBytes(2);
+    // to create a random number bettween 1000 and 9999
+    const verification_code = (random.readUInt16BE(0) % 9000) + 1000;
 
     // options to pass to the sendemail function
     const options = {
@@ -57,7 +55,6 @@ exports.sign_up_1 = (model) =>
       success: true,
       data: [],
       token: null,
-     
     });
   });
 
@@ -158,7 +155,7 @@ exports.signin = (model) =>
       });
     }
     try {
-      const Token = jwt.sign({ id: user._id },secret);
+      const Token = jwt.sign({ id: user._id }, secret);
       return res.status(200).send({
         status: "success",
         success: true,
@@ -177,14 +174,12 @@ exports.signin = (model) =>
     }
   });
 
-// todo: implement reset passsword end point , forgotpassword end point
-
-exports.forgotpassword = (model) => asynchandler(async (req, res, next) => {
-
-   const {email} = req.body;
-
-
-   const user = await model.findOne({ email: email });
+// api end point for sending reset password token to the email of the user 
+exports.forgotpassword = (model) =>
+  asynchandler(async (req, res, next) => {
+    const { email } = req.body;
+        
+    const user = await model.findOne({ email: email });
 
     if (!user) {
       return res.status(400).send({
@@ -195,121 +190,153 @@ exports.forgotpassword = (model) => asynchandler(async (req, res, next) => {
         token: null,
       });
     }
+    const random = crypto.randomBytes(2);
+    // to create a random number bettween 1000 and 9999
+    const resetToken = (random.readUInt16BE(0) % 9000) + 1000;
 
+    const message = {
+      emailto: email,
+      subject: "Password Reset",
+      text: `Your password reset token is ${resetToken}`,
+    };
 
-    const randomNumber = crypto.randomBytes(2).toString("hex");
-    const resetToken = crypto.createHash("sha256").update(randomNumber).digest("hex"); 
+    try {
+      await sendemail(message);
+      user.resetToken = resetToken;
+      user.resetTokenExpire = Date.now() + 10 * 60 * 1000;
+      user.save({
+        validateBeforeSave: false,
+      });
 
-  const message ={
-    emailto: email,
-    subject: "Password Reset",
-    text: `Your password reset token is ${resetToken}`
-  }
-
-  try {
-    await sendemail(message);
-     user.resetToken = resetToken;
-     user.resetTokenExpire = Date.now() + 10 * 60 * 1000;
-     user.save({
-      validateBeforeSave: false,
-     });
-
-    return res.status(200).send({
-      status: "success",
-      success: true,
-      message: "reset token sent to your email",
-      data: [],
-      token: null,
-    });
-  } catch (err) {
-    user.resetToken = undefined;
-    user.resetTokenExpire = undefined;
-    await user.save({ validateBeforeSave: false });
-    return res.status(500).send({
-      status: "fail",
-      success: false,
-      message: "unable to send email",
-      data: [],
-      token: null,
-    });
-    
-  }
-
-
-
+      return res.status(200).send({
+        status: "success",
+        success: true,
+        message: "reset token sent to your email",
+        data: [],
+        token: null,
+      });
+    } catch (err) {
+      user.resetToken = undefined;
+      user.resetTokenExpire = undefined;
+      await user.save({ validateBeforeSave: false });
+      return res.status(500).send({
+        status: "fail",
+        success: false,
+        message: "unable to send email",
+        data: [],
+        token: null,
+      });
+    }
   });
 
 
-
-  exports.resetoassword = (model)=>asynchandler(async(req, res, next )=>{
-
- 
-     const {
-      newpassword, 
-      resettoken 
-     } = req.body;
-     const user = await model.findOne({resetToken: resettoken, 
-      
-    }).select("+password");
-    if(!user){
+  // api end point for resetpassword with the new password 
+exports.resetpassword = (model) =>
+  asynchandler(async (req, res, next) => {
+    const { newpassword, resettoken } = req.body;
+    const user = await model
+      .findOne({ resetToken: resettoken })
+      .select("+password");
+    if (!user) {
       return res.status(404).send({
         status: "fail",
         success: false,
         message: "invalid token",
         data: [],
         token: null,
-      
       });
     }
 
-    if(user.resetTokenExpire<Date.now()){
+    if (user.resetTokenExpire < Date.now()) {
       return res.status(404).send({
         status: "fail",
         success: false,
         message: "token expired",
         data: [],
         token: null,
-      
       });
     }
 
+    try {
+      user.password = newpassword;
+      user.resetToken = undefined;
+      user.resetTokenExpire = undefined;
+      const logedToken = await jwt.sign({ id: user._id, secret });
+      await user.save({
+        validateBeforeSave: true,
+      });
 
-   try {
-    user.password = newpassword;
-    user.resetToken = undefined;
-    user.resetTokenExpire = undefined;
-    const logedToken = await jwt.sign({id : user._id, secret})
-    await user.save({
-      validateBeforeSave: true,
-    });
-
-    return res.status(200).send({
-      status: "success",
-      success: true,
-      message: "password reset successfully",
-      data: user,
-      token: logedToken,
-    });
-    
-   } catch (err) {
-
-    user.resetToken = undefined;
-    user.resetTokenExpire = undefined;
-    await user.save({ validateBeforeSave: false });
-    return res.status(500).send({
-      status: "fail",
-      success: false,
-      message: "unable to reset password",
-      data: [],
-      token: null,
-    });
-    
-   }
-
+      return res.status(200).send({
+        status: "success",
+        success: true,
+        message: "password reset successfully",
+        data: user,
+        token: logedToken,
+      });
+    } catch (err) {
+      user.resetToken = undefined;
+      user.resetTokenExpire = undefined;
+      await user.save({ validateBeforeSave: false });
+      return res.status(500).send({
+        status: "fail",
+        success: false,
+        message: "unable to reset password",
+        data: [],
+        token: null,
+      });
+    }
   });
-  
 
+// api end point to resend a verification code to the email addresse of the user
 
+exports.resendVerificationCode = (model) =>
+  asynchandler(async (req, res, next) => {
+    const user = await model.findOne({
+      email: req.body.email,
+    });
 
+    if (!user) {
+      return res.status(404).send({
+        status: "fail",
+        success: false,
+        message: "user not found",
+        data: [],
+        token: null,
+      });
+    }
+    try {
+      const random = crypto.randomBytes(2);
+      // to create a random number bettween 1000 and 9999
+      const randomNumber = (random.readUInt16BE(0) % 9000) + 1000;
+      // content of the email
+      const message = {
+        emailto: req.body.email,
+        subject: "re-send verification code",
+        text: `Your verification code is ${randomNumber}`,
+      };
+      // sending the email
+      await sendemail(message);
+      // saving the new verification code to the client model
+      user.verification_code = randomNumber;
+      user.verification_code_expire = new Date(Date.now() + 10 * 60 * 1000);
+      await user.save({
+        validateBeforeSave: false,
+      });
+
+      return res.status(200).send({
+        success: true,
+        status: "success",
+        message: "code has been sent to your email",
+        data: [],
+      });
+    } catch (err) {
+      return res.status(400).send({
+        success: false,
+        status: "fail",
+        message: "Error while sending verification code",
+        data: [],
+      });
+    }
+  });
 
 

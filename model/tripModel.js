@@ -3,7 +3,11 @@ const mongoose = require("mongoose");
 
 const tripModel = mongoose.Schema({
 
-  transporter :mongoose.Schema.Types.ObjectId,
+  transporter :{
+    type:mongoose.Schema.Types.ObjectId,
+    required:true,
+  },
+  
   City :{
     type : [{
       type : Map , 

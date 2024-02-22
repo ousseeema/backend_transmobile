@@ -244,7 +244,15 @@ Profil_Picture : {
   verification_code_expire :{
     type : Date, 
     default : undefined,
-  }
+  }, 
+  comments :{
+    type :[{
+      type : Map, 
+      of : mongoose.Schema.Types.Mixed
+    }]
+  },
+  //demandeOfDelivery:
+
  
 
 

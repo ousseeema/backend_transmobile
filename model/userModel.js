@@ -113,6 +113,14 @@ const userModel = mongoose.Schema({
   ,
   verification_code_expire :{
     type : Date, 
+  },
+  Historique :{
+    type : [
+      {
+        type : Map, 
+        of : mongoose.Schema.Types.Mixed
+      }
+    ]
   }
 
 

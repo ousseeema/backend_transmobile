@@ -254,8 +254,38 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
 
 // refuse de demande 
 exports.refusedemande = asyncHandler(async(req, res, next)=>{
-  
-})
+ 
+  const refuse = await demandeDelv.findByIdAndUpdate({
+    id : req.body.id,
+  }, 
+  {  refuse : true,
+  },  );
+
+
+
+  if(!refuse){
+    return res.status(400).send({
+      message : "error in while refusing the request ",
+      status :"fail",
+      success : false,
+     data :[]
+    });
+  }
+
+
+  return res.status(200).send({
+    message : "request have been refused",
+    status :"success",
+    success : true,
+   data :[]
+  });
+
+   
+
+
+
+}); 
+
 
 
  

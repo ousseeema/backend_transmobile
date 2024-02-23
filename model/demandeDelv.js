@@ -65,7 +65,10 @@ const  demande = mongoose.Schema({
   },
   accepted : {
    type : Boolean, 
-   default : false 
+  
+  },
+  refuse :{
+    type: Boolean,
   },
    
   createdAt : {

@@ -196,13 +196,7 @@ Profil_Picture : {
     unique : false,
   },
 
-  Clients : {
-    type : Array,
-    default : [],
-    required : false,
-    trim : true ,
-    unique : false,
-  },
+
   Role:{
   type : String,
   default : 'Transporter',

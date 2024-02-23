@@ -1,7 +1,8 @@
 const asyncHandler = require('../middleware/asynchandller');
 const transporteur = require('../model/transportorModel');
 const fs = require("fs");
-
+const tripModel =require('../model/tripModel');
+const demandeDelv = require('../model/demandeDelv');
 
 
 
@@ -129,6 +130,132 @@ const file = req.files.file;
 });
 
 
+
+// add trip annonce 
+
+exports.addTrip = asyncHandler(async(req, res, next) => {
+
+  const test = await tripModel.findById(req.body.transporter).where({
+    isDone : false,
+  });
+  if(test){
+    return res.status(203).send({
+      status : "fail",
+      success : false ,
+      message : 'You cannot add trip twice ',
+    })
+
+  }
+    const trip= await tripModel.create(req.body, {
+     runvalidate : true
+  });
+
+  if(!trip){
+    return res.status(203).send({
+      status : "fail",
+      success : false ,
+      message : 'You cannot add trip twice ',
+    })
+
+  }
+
+
+  res.status(200).send({
+    success : true , 
+    status: "success", 
+    message : "You have posted a trip successfuly"
+  });
+
+
+});
+
+
+
+// get all demandes for the transporter 
+exports.getAlldemande = asyncHandler(async(req, res, next) => {
+
+ const alldemandes = await demandeDelv.find(
+  {transporter : res.user.id}
+  );
+   if(!alldemandes){
+
+    return res.status(403).send({
+      message : "bad request",   
+      success : false,
+       status : "fail",
+       data :[],
+
+    });
+   }
+
+
+   return res.status(200).send({
+    message : "Liste of request",   
+    success : true,
+     status : "success",
+     data :alldemandes,
+
+  });
+
+
+});
+
+
+// acceptation des demande 
+exports.acceptDemande = asyncHandler(async(req, res, next)=>{
+
+ const demandeaccepte = await demandeDelv.findByIdAndUpdate(
+  {id:req.body.id},
+  {
+  accepted : true, 
+  
+ });
+
+ if(!demandeaccepte){
+
+  return res.status(400).send({
+    message : "error while accepting this request",
+    status :"fail",
+    success : false,
+   data :[]
+  });
+ }
+
+
+
+ const addPackageTo_theTrip = await tripModel.findById(
+  {
+    id: demandeaccepte.transporter,
+  },
+ 
+ ).where(isDone == false);
+
+
+ if(!addPackageTo_theTrip){
+  return res.status(400).send({
+    message : "error seatching for trip",
+    status :"fail",
+    success : false,
+   data :[]
+  });
+ }
+
+   addPackageTo_theTrip.packages.push(demandeaccepte);
+   addPackageTo_theTrip.save();
+
+
+   return res.status(200).send({
+    message : "demande accepted and package add to the List successfuly",
+    success : true,
+    status :"success",
+    data : addPackageTo_theTrip
+  });
+});
+
+// refuse de demande 
+exports.refusedemande = asyncHandler(async(req, res, next)=>{
+  
+})
 
 
  

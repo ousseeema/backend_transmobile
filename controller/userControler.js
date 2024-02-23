@@ -1,7 +1,8 @@
 const asyncHandler = require('../middleware/asynchandller');
 const userModel = require('../model/userModel');
-const  transporteur =require('../model/transportorModel')
+const demande = require('../model/demandeDelv');
 const fs = require("fs");
+const path = require('path');
 // updating user data name email
 
 exports.updateUserDetails= asyncHandler(async(req, res , next) => {
@@ -147,6 +148,73 @@ exports.getallTransportors = asyncHandler(async(req, res, next) => {
 
 
 });
+
+
+
+// send a request to the transporter to accepot the package
+
+ 
+
+exports.sendRequest = asyncHandler(async(req, res, next)=>{
+
+
+   const file = req.files.file ;
+   if(!file){
+    return res.status(404).send({
+      success : false , 
+      status : "fail",
+      message : "Please add the images of the packages"
+    });
+   }
+   if(! file.mimetype.startsWith("image")){
+    return res.status(404).send({
+      success : false , 
+      status : "fail",
+      message : "Please add file type image png jpeg jpg "
+    });
+   }
+   if(file.size> 1000000){
+
+    return res.status(404).send({
+      success : false , 
+      status : "fail",
+      message : "Ops! size is to big "
+    });
+   }
+   file.name = `package_${res.user.id}${path.parse(file.name).ext}`;
+   file.mv(
+       `./Images/packages/demandeimage/${file.name}`
+   );
+
+
+   req.body.message.packagephoto = file.name;
+ 
+
+
+   const user_demande = await demande.create(req.body, {
+    runvalidate : true,
+
+   });
+
+   if(!user_demande){
+    return res.status(203).send(
+      {
+        status: "fail", 
+        success : false ,
+        data:[] ,
+        message :" Ops ! we coudn't create your request duo to an error in the request"
+      }
+    );
+   }
+
+
+   res.status(201).send({
+    status : "success", 
+    message : "Request have sent successfuly ",
+    data :[],
+   });
+});
+
 
   
 

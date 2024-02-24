@@ -135,7 +135,9 @@ const file = req.files.file;
 
 exports.addTrip = asyncHandler(async(req, res, next) => {
 
-  const test = await tripModel.findById(req.body.transporter).where({
+  const test = await tripModel.findById(
+    res.user.id,
+    ).where({
     isDone : false,
   });
   if(test){
@@ -205,7 +207,7 @@ exports.getAlldemande = asyncHandler(async(req, res, next) => {
 exports.acceptDemande = asyncHandler(async(req, res, next)=>{
 
  const demandeaccepte = await demandeDelv.findByIdAndUpdate(
-  {id:req.body.id},
+  {client:req.body.id},
   {
   accepted : true, 
   
@@ -225,7 +227,7 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
 
  const addPackageTo_theTrip = await tripModel.findById(
   {
-    id: demandeaccepte.transporter,
+    transporter: demandeaccepte.transporter,
   },
  
  ).where(isDone == false);
@@ -285,6 +287,89 @@ exports.refusedemande = asyncHandler(async(req, res, next)=>{
 
 
 }); 
+
+
+// get all packages for the current trip 
+exports.getAllPackage_forSingleTrip = asyncHandler(async(req, res ,next)=>{
+
+  const allPackage = await tripModel.find({
+    transporter : res.user.id,
+    isDone : false ,
+  });
+  if(!allPackage){
+    return res.status(404).send({
+      message : "No trip for the moment", 
+      status : "fail",
+      success : false,
+      data : []
+    });
+  }
+  return res.status(200).send({
+    message : "List of packages for this trip", 
+    status : "success",
+    success : true,
+    data : allPackage
+  });
+
+});
+
+
+// search for a specific trip 
+exports.searchForTrip = asyncHandler(async(req,  res, next)=>{
+
+  try {
+    let query;
+
+    // Copy the req.query object
+    const reqQuery = { ...req.query };
+
+    // Fields to exclude from filtering
+    const removeFields = ["select", "sort"];
+
+    // Loop over removeFields and delete them from reqQuery
+    removeFields.forEach(param => delete reqQuery[param]);
+
+    // Create query string
+    let queryStr = JSON.stringify(reqQuery);
+
+    // Create operators ($gt, $gte, etc)
+    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
+
+    // Finding resource
+    query = model.find(JSON.parse(queryStr));   
+
+    // Select fields
+    if (req.query.select) {
+        const fields = req.query.select.split(",").join(" ");
+        query = query.select(fields);
+    }
+
+    // Sort
+    if (req.query.sort) {
+        const sortBy = req.query.sort.split(",").join(" ");
+        query = query.sort(sortBy);
+    } else {
+        query = query.sort("createdAt");
+    }
+
+    return res.status(200).send({
+      message : "we found some results",
+      status : "success",
+      success : true,
+      data :query,
+    });
+
+  
+
+
+   
+} catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: "Server Error" });
+}
+});
+
+
 
 
 

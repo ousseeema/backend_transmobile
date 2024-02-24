@@ -336,7 +336,7 @@ exports.searchForTrip = asyncHandler(async(req,  res, next)=>{
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
     // Finding resource
-    query = model.find(JSON.parse(queryStr));   
+    query = tripModel.find(JSON.parse(queryStr));   
 
     // Select fields
     if (req.query.select) {
@@ -364,8 +364,10 @@ exports.searchForTrip = asyncHandler(async(req,  res, next)=>{
 
    
 } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, error: "Server Error" });
+    
+    return res.status(500).send({ 
+      success: false, message: "Server Error",
+    data:[] });
 }
 });
 

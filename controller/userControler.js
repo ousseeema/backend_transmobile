@@ -1,8 +1,10 @@
 const asyncHandler = require('../middleware/asynchandller');
 const userModel = require('../model/userModel');
 const demande = require('../model/demandeDelv');
+const verifiedModel = require("../model/verifiedDemande");
 const fs = require("fs");
 const path = require('path');
+const verifiedDemande = require('../model/verifiedDemande');
 // updating user data name email
 
 exports.updateUserDetails= asyncHandler(async(req, res , next) => {
@@ -219,11 +221,74 @@ exports.sendRequest = asyncHandler(async(req, res, next)=>{
 exports.getVerified = asyncHandler(async(req, res ,next)=>{
 
   // testing the input file and data 
+  const {fullname , CIN , message, } = req.body;
+
+  if(!name || !fullname|| !message){
+    return res.status(400).send({
+      message : "Please enter your information or message ",
+      status : "fail", 
+      success : false ,
+      data :[],
+    });
+  }
 
 
+  const passport_image = req.files.file;
 
-  
-})
+
+  if(!passport_image){
+     return res.status(404).send({
+      message : "Please add a image of your passport ",
+      success : false ,
+      data :[],
+      status : "fail"
+     });
+
+
+  }
+  if(file.mimetype.startsWith('image')){
+    return res.status(404).send({
+      message : "Please add a image of your passport ",
+      success : false ,
+      data :[],
+      status : "fail"
+     });
+
+  }
+  if(file.size>1000000){
+    return res.status(404).send({
+      message : "image of your passport must be under 1MB ",
+      success : false ,
+      data :[],
+      status : "fail"
+     });
+  }
+
+ file.name = `passport_${req.user.id}${path.parse(file.name).ext}`
+  req.body.passport_image = file.name;
+
+  file.mv(`./Images/passport/${file.name}`);
+
+  const demandeVerified = await verifiedModel.create(req.body);
+
+    if(!demandeVerified){
+      return res.status(404).send({
+        message: "Error while creating the request",
+        success : false, 
+        status : "fail",
+        data:[]
+      });
+    }
+
+    return res.status(200).send({
+      message : "Your request has been sended to the admins ",
+      success : true , 
+      status : "success",
+      data :[],
+    });
+
+
+});
 
 
   

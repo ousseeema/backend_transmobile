@@ -216,6 +216,16 @@ exports.sendRequest = asyncHandler(async(req, res, next)=>{
 });
 
 
+exports.getVerified = asyncHandler(async(req, res ,next)=>{
+
+  // testing the input file and data 
+
+
+
+  
+})
+
+
   
 
 

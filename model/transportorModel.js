@@ -1,6 +1,32 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const geocoder= require('../utils/geocoder');
+
+const comment = mongoose.Schema({
+  fullname :{
+    type : String , 
+    required : [true, "please enter your name first"],
+    trim : true , 
+
+  },
+  comment :{
+    type : String ,
+    required : [true, "Please enter a comment "],
+    trim : true ,
+
+  },
+  rating :{
+    type : Number , 
+    default : 0,
+    required : [true , "please add a rating to the transporter"]
+  },
+  createdAt :{
+    type : Date ,
+    default : Date.now()
+  }
+
+});
+
 const TransporteurModel = mongoose.Schema({
 
   fullName : 
@@ -122,15 +148,20 @@ const TransporteurModel = mongoose.Schema({
   HomePickUps :{
     type : Boolean,
     required : true,
-    trim : true ,
-    unique : false,
+   
   },
   HomeDelivery :{
 
     type : Boolean,
     required : true,
-    trim : true ,
-    unique : false,
+   
+    
+
+  },
+  price_kg :{
+   type : Number,
+   required : [true, "Please enter a price for a 1 kg "] , 
+   default: 0, 
 
   },
   Parsols:{
@@ -139,7 +170,7 @@ const TransporteurModel = mongoose.Schema({
     required : fasle,
 
   },
-  Aarsols_Site:{
+  Parsols_Site:{
     type: Array,
     enum:["Amazon", "Ebay","Ali Express","Shein","temu" ,"Autre"],
   },
@@ -171,22 +202,20 @@ Profil_Picture : {
     type : Number,
     default : 0,
     required : false,
-    trim : true ,
-    unique : false,
+   
 },
+
   numberofClients : {
     type : Number,
     default : 0,
     required : false,
-    trim : true ,
-    unique : false,
+   
   },
   numberofPackages : {
     type : Number,
     default : 0,
     required : false,
-    trim : true ,
-    unique : false,
+ 
   },
   LocalAdresse : {
     type : String,
@@ -206,8 +235,15 @@ Profil_Picture : {
     type : Number,
     default : 0,
     required : false,
-    trim : true ,
-    unique : false,
+   
+  },
+  verified :{
+    type : Boolean,
+    default : false,
+  },
+  pro:{
+    type: Boolean,
+    default : true ,
   },
   
   
@@ -241,8 +277,9 @@ Profil_Picture : {
   }, 
   comments :{
     type :[{
-      type : Map, 
-      of : mongoose.Schema.Types.Mixed
+      type : [comment], 
+      required : true , 
+     
     }]
   },
   //demandeOfDelivery:

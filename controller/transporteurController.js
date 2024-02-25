@@ -134,7 +134,7 @@ const file = req.files.file;
 // add trip annonce 
 
 exports.addTrip = asyncHandler(async(req, res, next) => {
-
+// test if the transporter has already been added a trip 
   const test = await tripModel.findById(
     res.user.id,
     ).where({
@@ -148,6 +148,8 @@ exports.addTrip = asyncHandler(async(req, res, next) => {
     })
 
   }
+  
+     // crating a new trip with the details 
     const trip= await tripModel.create(req.body, {
      runvalidate : true
   });
@@ -160,6 +162,19 @@ exports.addTrip = asyncHandler(async(req, res, next) => {
     })
 
   }
+  // adding +1 for every trip add successfully
+  const transporter = await transporteur.findByIdAndUpdate({_id : req.user.id},
+    { $inc: {numberofTrips : 1} }
+    );
+    if(!transporter){
+      return res.status(400).send({
+        message : "error while adding  the trip ",
+        status :"fail",
+        success : false,
+       data :[]
+      });
+     }
+  
 
 
   res.status(200).send({
@@ -205,7 +220,7 @@ exports.getAlldemande = asyncHandler(async(req, res, next) => {
 
 // acceptation des demande 
 exports.acceptDemande = asyncHandler(async(req, res, next)=>{
-
+  // accepting the demande and changing the attrb to true 
  const demandeaccepte = await demandeDelv.findByIdAndUpdate(
   {client:req.body.id},
   {
@@ -224,13 +239,26 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
  }
 
 
+ const transporter = await transporteur.findByIdAndUpdate({_id : req.user.id},
+  { $inc: {numberofPackages : 1, numberofClient : 1} }
+  );
+  if(!transporter){
+    return res.status(400).send({
+      message : "error while adding package to the trip ",
+      status :"fail",
+      success : false,
+     data :[]
+    });
+   }
 
+// adding the package to the trip
  const addPackageTo_theTrip = await tripModel.findById(
   {
     transporter: demandeaccepte.transporter,
   },
  
  ).where(isDone == false);
+
 
 
  if(!addPackageTo_theTrip){
@@ -244,6 +272,20 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
 
    addPackageTo_theTrip.packages.push(demandeaccepte);
    addPackageTo_theTrip.save();
+ 
+
+   // adding +1 every time a new package add 
+   const transport = await transporteur.findByIdAndUpdate({_id : req.user.id},
+    { $inc: {numberofPackages : 1, numberofClient : 1} }
+    );
+    if(!transport){
+      return res.status(400).send({
+        message : "error while adding package to the trip ",
+        status :"fail",
+        success : false,
+       data :[]
+      });
+     }
 
 
    return res.status(200).send({
@@ -304,6 +346,7 @@ exports.getAllPackage_forSingleTrip = asyncHandler(async(req, res ,next)=>{
       data : []
     });
   }
+  // todo fix the problem of resending the photo of the package from the serveur to the user 
   return res.status(200).send({
     message : "List of packages for this trip", 
     status : "success",

@@ -10,11 +10,11 @@ router.route("/updateTransporteurDetails").put(protect(transporteur), updateUser
 router.route("/uploadProfilePicture").post(protect(transporteur), uploadProfilePicture);
 router.route("/getAllPackage").get(protect(transporteur), getAllPackage_forSingleTrip);
 router.route("/acceptDemande").put(protect(transporteur), acceptDemande);
-router.route("/searchForTrip").post(protect(transporteur), searchForTrip);
 router.route("/refuseDemande").put(protect(transporteur), refusedemande);
-router.route("/getAllDemande").post(protect(transporteur), getAlldemande);
+router.route("/getAllDemande").get(protect(transporteur), getAlldemande);
 
 
 
+module.exports = router ;
 
 

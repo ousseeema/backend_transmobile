@@ -4,7 +4,8 @@ const demande = require('../model/demandeDelv');
 const verifiedModel = require("../model/verifiedDemande");
 const fs = require("fs");
 const path = require('path');
-const verifiedDemande = require('../model/verifiedDemande');
+const tripModel = require('../model/tripModel') ;
+const transporteur = require("../model/transportorModel");
 // updating user data name email
 
 exports.updateUserDetails= asyncHandler(async(req, res , next) => {
@@ -25,7 +26,7 @@ exports.updateUserDetails= asyncHandler(async(req, res , next) => {
     });
   }
 
-  const user = await userModel.findByIdAndUpdate(req.body,
+  const user = await userModel.findByIdAndUpdate(req.user.id,
     {
       runvalidate : true , 
       new : true});
@@ -61,6 +62,7 @@ const file = req.files.file;
       success : false ,
       message : "Please upload a file",
       data : []
+      
     });
    }
   
@@ -72,38 +74,40 @@ const file = req.files.file;
     });
    }
 
-   if(file.mimetype.startsWith("image")){
+   /*if(file.mimetype.startsWith("image")){
     return res.status(400).send({
       success : false ,
       message : "Please upload an image file  ex : jpg, jpeg, png",
       data : []
     });
    }
+   */
+
+       // if the user have a profile picture already delete it from the serveur 
+       if(req.user.profilePicture !== "default.jpg"){
+        fs.unlink(`./Images/private/users/${req.user.profilePicture}`, (err) => {
+          if (err) {
+            console.error(err)
+            return  res.status(400).send({
+              success : false ,
+              message : "error updating profile picture",
+              data : []
+            });
+          }
+        });
+        
+    
+    
+    
+       }
      
    // upload the new profile picture on the serveur 
    file.name = `photo_${req.user.id}${path.parse(file.name).ext}`;
     file.mv(
-    `./images/private/users/${file.name}`,
+    `./Images/private/users/${file.name}`,
      
     );
 
-
-       // if the user have a profile picture already delete it from the serveur 
-    if(req.user.profilePicture !== "default.png"){
-      fs.unlink(`./images/private/users/${req.user.profilePicture}`, (err) => {
-        if (err) {
-          console.error(err)
-          return  res.status(400).send({
-            success : false ,
-            message : "error updating profile picture",
-            data : []
-          });
-        }
-      });
-  
-  
-  
-     }
 
       // updating the new profile picture in the database 
     const user = await userModel.findByIdAndUpdate(
@@ -129,7 +133,7 @@ const file = req.files.file;
 exports.getallTransportors = asyncHandler(async(req, res, next) => {
 
 
-  const transportors = await transporteurs.find();
+  const transportors = await transporteur.find();
 
 
    if(!transportors){
@@ -288,6 +292,64 @@ exports.getVerified = asyncHandler(async(req, res ,next)=>{
     });
 
 
+});
+
+
+// search for a specific trip 
+exports.searchForTrip = asyncHandler(async(req,  res, next)=>{
+
+  try {
+    let query;
+
+    // Copy the req.query object
+    const reqQuery = { ...req.query };
+
+    // Fields to exclude from filtering
+    const removeFields = ["select", "sort"];
+
+    // Loop over removeFields and delete them from reqQuery
+    removeFields.forEach(param => delete reqQuery[param]);
+
+    // Create query string
+    let queryStr = JSON.stringify(reqQuery);
+
+    // Create operators ($gt, $gte, etc)
+    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
+
+    // Finding resource
+    query = tripModel.find(JSON.parse(queryStr));   
+
+    // Select fields
+    if (req.query.select) {
+        const fields = req.query.select.split(",").join(" ");
+        query = query.select(fields);
+    }
+
+    // Sort
+    if (req.query.sort) {
+        const sortBy = req.query.sort.split(",").join(" ");
+        query = query.sort(sortBy);
+    } else {
+        query = query.sort("createdAt");
+    }
+
+    return res.status(200).send({
+      message : "we found some results",
+      status : "success",
+      success : true,
+      data :query,
+    });
+
+  
+
+
+   
+} catch (err) {
+    
+    return res.status(500).send({ 
+      success: false, message: "Server Error",
+    data:[] });
+}
 });
 
 

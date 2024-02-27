@@ -31,9 +31,9 @@ const userModel = mongoose.Schema({
 
 
   },
-  Phoen_Number:{
+  Phone_Number:{
      type : String ,
-      required : [true, "Please enter your phone number"] ,
+      required : false ,
       trim : true ,
       maxlength : [20,'Phone number can not be longer than 20 characters'],
       minlength:[8,'Phone number can not be longer than 8 characters'],
@@ -51,13 +51,7 @@ const userModel = mongoose.Schema({
     default : 'Client',
     },
 
-  numberofClients : {
-    type : Number,
-    default : 0,
-    required : false,
-    trim : true ,
-    unique : false,
-  },
+ 
   numberofPackagesSended : {
     type : Number,
     default : 0,
@@ -72,19 +66,17 @@ const userModel = mongoose.Schema({
     trim : true ,
     unique : false,
   },
-  destine_City:{
-    type : String,
-
-    required : true,
-    trim : true ,
-    unique : false,
-  },
+ 
   country : {
     type : String,
     default : "",
     required : false,
     trim : true ,
     unique : false,
+  },
+  profilePicture :{
+    type: String, 
+    default : "default.jpg"
   },
 
   resetToken : {

@@ -357,65 +357,79 @@ exports.getAllPackage_forSingleTrip = asyncHandler(async(req, res ,next)=>{
 });
 
 
-// search for a specific trip 
-exports.searchForTrip = asyncHandler(async(req,  res, next)=>{
 
-  try {
-    let query;
 
-    // Copy the req.query object
-    const reqQuery = { ...req.query };
 
-    // Fields to exclude from filtering
-    const removeFields = ["select", "sort"];
+exports.getVerified = asyncHandler(async(req, res ,next)=>{
 
-    // Loop over removeFields and delete them from reqQuery
-    removeFields.forEach(param => delete reqQuery[param]);
+  // testing the input file and data 
+  const {fullname , CIN , message, } = req.body;
 
-    // Create query string
-    let queryStr = JSON.stringify(reqQuery);
+  if(!name || !fullname|| !message){
+    return res.status(400).send({
+      message : "Please enter your information or message ",
+      status : "fail", 
+      success : false ,
+      data :[],
+    });
+  }
 
-    // Create operators ($gt, $gte, etc)
-    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
-    // Finding resource
-    query = tripModel.find(JSON.parse(queryStr));   
+  const passport_image = req.files.file;
 
-    // Select fields
-    if (req.query.select) {
-        const fields = req.query.select.split(",").join(" ");
-        query = query.select(fields);
-    }
 
-    // Sort
-    if (req.query.sort) {
-        const sortBy = req.query.sort.split(",").join(" ");
-        query = query.sort(sortBy);
-    } else {
-        query = query.sort("createdAt");
+  if(!passport_image){
+     return res.status(404).send({
+      message : "Please add a image of your passport ",
+      success : false ,
+      data :[],
+      status : "fail"
+     });
+
+
+  }
+  if(file.mimetype.startsWith('image')){
+    return res.status(404).send({
+      message : "Please add a image of your passport ",
+      success : false ,
+      data :[],
+      status : "fail"
+     });
+
+  }
+  if(file.size>1000000){
+    return res.status(404).send({
+      message : "image of your passport must be under 1MB ",
+      success : false ,
+      data :[],
+      status : "fail"
+     });
+  }
+
+ file.name = `passport_${req.user.id}${path.parse(file.name).ext}`
+  req.body.passport_image = file.name;
+
+  file.mv(`./Images/passport/${file.name}`);
+
+  const demandeVerified = await verifiedModel.create(req.body);
+
+    if(!demandeVerified){
+      return res.status(404).send({
+        message: "Error while creating the request",
+        success : false, 
+        status : "fail",
+        data:[]
+      });
     }
 
     return res.status(200).send({
-      message : "we found some results",
+      message : "Your request has been sended to the admins ",
+      success : true , 
       status : "success",
-      success : true,
-      data :query,
+      data :[],
     });
 
-  
 
-
-   
-} catch (err) {
-    
-    return res.status(500).send({ 
-      success: false, message: "Server Error",
-    data:[] });
-}
 });
-
-
-
-
 
  

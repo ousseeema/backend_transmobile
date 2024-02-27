@@ -61,7 +61,7 @@ const TransporteurModel = mongoose.Schema({
   },
   PhoneNumber_A :{
     type : String,
-    required : [true, "Please enter your phone number for place A"] ,
+    required : false ,
     trim : true ,
     unique : true,
     maxlength : 20,
@@ -69,7 +69,7 @@ const TransporteurModel = mongoose.Schema({
   } , 
   PhoneNumber_B :{
     type : String,
-    required : [true, "Please enter your phone number for place B"] ,
+    required : false ,
     trim : true ,
     unique : true,
     maxlength : 20,
@@ -117,29 +117,29 @@ const TransporteurModel = mongoose.Schema({
 
   Car_Brand :{
     type : String,
-    required : [true, "Please enter your car brand"] ,
+    required : false ,
     trim : true ,
     unique : false,
   },
   Car_SerieNumber:{
     type : String,
-    required : [true, "Please enter your car serie number"] ,
+    required : false ,
     trim : true ,
     unique : true,
   },
   ListCountry_1:{
-    type : Array,
+    type : [String],
     
-    required : true,
-    enum :[ "France", "Germany", "Italy", "Spain", "Portugal", "Belgium", "Netherlands",  "Switzerland", "United Kingdom", "Ireland", "Denmark", "Norway", "Sweden",    ],
+    required : false,
+    enum :[ "France", "Germany", "Italy", "Spain", "Portugal", "Belgium", "Netherlands",  "Switzerland", "United Kingdom", "Ireland", "Denmark", "Norway", "Sweden"],
     trim : true ,
     unique : false,
   },
   
   ListCountry_2:{
-    type : Array,
+    type : [String],
     
-    required : true,
+    required : false,
     enum:["Algeria", "Tunisia", "Morocco","Libya"],
     trim : true ,
     unique : false,
@@ -147,38 +147,38 @@ const TransporteurModel = mongoose.Schema({
 
   HomePickUps :{
     type : Boolean,
-    required : true,
+    required : false,
    
   },
   HomeDelivery :{
 
     type : Boolean,
-    required : true,
+    required :false,
    
     
 
   },
   price_kg :{
    type : Number,
-   required : [true, "Please enter a price for a 1 kg "] , 
+   required : false , 
    default: 0, 
 
   },
   Parsols:{
 
     type : Boolean,
-    required : fasle,
+    required : false,
 
   },
   Parsols_Site:{
-    type: Array,
+    type: [String],
     enum:["Amazon", "Ebay","Ali Express","Shein","temu" ,"Autre"],
   },
   Adresse_Parsols: {
     type: {
       type: String,
       enum: ["Point"],
-     //required: [true, 'please enter location ']
+     required: false
     },
     coordinates: {
       type: [Number],
@@ -195,7 +195,7 @@ const TransporteurModel = mongoose.Schema({
 Profil_Picture : {
   type : String,
   default : "default.jpg",
-  required : [true, 'Please enter picture'],
+  required : false,
   unique : false,
 },
   numberofTrips : {
@@ -278,7 +278,7 @@ Profil_Picture : {
   comments :{
     type :[{
       type : [comment], 
-      required : true , 
+      required : false , 
      
     }]
   },
@@ -295,8 +295,8 @@ TransporteurModel.pre("save", async function(next){
 
 
   if(!this.isModified("password")) return next();
-
-  this.password = await bcrypt.hash(this.password, "westudySG");
+   const  gensalt =await bcrypt.genSalt(3)
+  this.password = await bcrypt.hash(this.password,gensalt );
   next();
 });
 TransporteurModel.methods.matchPassword = function(password){

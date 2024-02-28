@@ -1,11 +1,12 @@
 const asyncHandler = require('../middleware/asynchandller');
 const userModel = require('../model/userModel');
 const demande = require('../model/demandeDelv');
-const verifiedModel = require("../model/verifiedDemande");
+const verified = require("../model/verifiedDemande");
 const fs = require("fs");
 const path = require('path');
 const tripModel = require('../model/tripModel') ;
 const transporteur = require("../model/transportorModel");
+const { json } = require('express');
 // updating user data name email
 
 exports.updateUserDetails= asyncHandler(async(req, res , next) => {
@@ -83,6 +84,7 @@ const file = req.files.file;
    }
    */
 
+
        // if the user have a profile picture already delete it from the serveur 
        if(req.user.profilePicture !== "default.jpg"){
         fs.unlink(`./Images/private/users/${req.user.profilePicture}`, (err) => {
@@ -90,12 +92,12 @@ const file = req.files.file;
             console.error(err)
             return  res.status(400).send({
               success : false ,
-              message : "error updating profile picture",
+              message : "error updating  picture",
               data : []
             });
           }
         });
-        
+
     
     
     
@@ -118,6 +120,18 @@ const file = req.files.file;
         new : true
       }
       );
+      if(!user){
+        return res.status(400).send({
+          success : false ,
+          message : "error updating profile picture",
+          data : []
+        });
+      }
+      return res.status(200).send({
+        message: "Profile picture updated successfully",
+        success : true ,
+        data : user
+      });
 
 
 
@@ -223,44 +237,27 @@ exports.sendRequest = asyncHandler(async(req, res, next)=>{
 
 
 exports.getVerified = asyncHandler(async(req, res ,next)=>{
+//! convert the req to an object because it came in String format 
+let result = JSON.parse(req.body.data);
+//! adding the client id to the object 
+ result.demander_id= req.user.id;
 
-  // testing the input file and data 
-  const {fullname , CIN , message, } = req.body;
-
-  if(!name || !fullname|| !message){
-    return res.status(400).send({
-      message : "Please enter your information or message ",
-      status : "fail", 
-      success : false ,
-      data :[],
-    });
-  }
-
-
-  const passport_image = req.files.file;
-
-
-  if(!passport_image){
+  const file = req.files.file;
+  
+  if(!file){
      return res.status(404).send({
+
       message : "Please add a image of your passport ",
       success : false ,
       data :[],
       status : "fail"
      });
 
-
-  }
-  if(file.mimetype.startsWith('image')){
-    return res.status(404).send({
-      message : "Please add a image of your passport ",
-      success : false ,
-      data :[],
-      status : "fail"
-     });
 
   }
   if(file.size>1000000){
     return res.status(404).send({
+
       message : "image of your passport must be under 1MB ",
       success : false ,
       data :[],
@@ -269,11 +266,16 @@ exports.getVerified = asyncHandler(async(req, res ,next)=>{
   }
 
  file.name = `passport_${req.user.id}${path.parse(file.name).ext}`
-  req.body.passport_image = file.name;
-
+  
+  //! then adding the image name to the ressult of tthe convert 
+  result.passport_image = file.name;
+  //! move the image to the directory
   file.mv(`./Images/passport/${file.name}`);
+  
 
-  const demandeVerified = await verifiedModel.create(req.body);
+
+  const demandeVerified = await verified.create(result)
+
 
     if(!demandeVerified){
       return res.status(404).send({
@@ -290,6 +292,8 @@ exports.getVerified = asyncHandler(async(req, res ,next)=>{
       status : "success",
       data :[],
     });
+
+   
 
 
 });

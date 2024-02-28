@@ -8,6 +8,7 @@ const errorhandler = (err,req, res, next) => {
     res.send({ message: "Duplicate key entered" });
   }
   else if (err.name === "ValidationError") {
+    
     const messages = Object.values(err.errors).map((val) => val.message);
       res.status(400).send({success: false, message:messages})
   }
@@ -15,6 +16,26 @@ const errorhandler = (err,req, res, next) => {
     res.status(400).send({
       success : false,
       message: "error syntax in the body"
+    });
+    
+  }
+ 
+  else if(err.name==="TokenExpiredError"){
+    res.status(400).send({
+      success : false,
+      message: "token expired"
+    })
+  }
+  else if(err.name==="TypeError"){
+    res.status(400).send({
+      success : false,
+      message: "input error"
+    })
+  }
+  else if(err.name==="Error"){
+    res.status(400).send({
+      success : false,
+      message: "error"
     })
   }
   else{

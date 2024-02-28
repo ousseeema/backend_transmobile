@@ -4,7 +4,10 @@ const mongoose = require("mongoose");
 
 const verified = mongoose.Schema({
  
-  demander_id : mongoose.Schema.ObjectId,
+  demander_id :{
+    type: mongoose.Schema.ObjectId,
+  required: true
+},
   fullname :{
     type: String , 
     required : true, 
@@ -19,6 +22,10 @@ const verified = mongoose.Schema({
     required : true ,
 
   },
+  approved :{
+    type: Boolean ,
+    default : false
+  },
   createdAt :{
     type : Date ,
     default : Date.now()
@@ -26,4 +33,4 @@ const verified = mongoose.Schema({
 
 });
 
-module.exports = mongoose.model("verified", verified);
+module.exports = mongoose.model("verifi",verified);

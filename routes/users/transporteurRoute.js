@@ -7,10 +7,15 @@ const {updateUserDetails,uploadProfilePicture, acceptDemande,searchForTrip, refu
 
 
 router.route("/updateTransporteurDetails").put(protect(transporteur), updateUserDetails);
+
 router.route("/uploadProfilePicture").post(protect(transporteur), uploadProfilePicture);
+
 router.route("/getAllPackage").get(protect(transporteur), getAllPackage_forSingleTrip);
+
 router.route("/acceptDemande").put(protect(transporteur), acceptDemande);
+
 router.route("/refuseDemande").put(protect(transporteur), refusedemande);
+
 router.route("/getAllDemande").get(protect(transporteur), getAlldemande);
 
 

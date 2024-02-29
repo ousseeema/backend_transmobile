@@ -10,8 +10,10 @@ const { json } = require('express');
 // updating user data name email
 
 exports.updateUserDetails= asyncHandler(async(req, res , next) => {
+    
+  let request = JSON.parse(req.body.data);
    
-   if(req.body.password){
+   if(req.body.data.password){
     return res.status(400).send({
       success : false ,
       message : "You can't update password from here",
@@ -19,15 +21,35 @@ exports.updateUserDetails= asyncHandler(async(req, res , next) => {
     });
    }
   
-  if (!req.body){
+  if (!request){
     return res.status(400).send({
       success : false ,
       message : "Please enter the data you want to update",
       data : []
     });
   }
+  const file = req.files.file;
+  if(!file){
+    return res.status(400).send({
+      success : false ,
+      message : "Please upload a photo",
+      data : []
+    });
+  }
 
+  if(file.size> 1000000){
+    return res.status(400).send({
+      success : false ,
+      message : "File size should not exceed 1MB",
+      data : []
+    });
+  }
+  file.name = `user_${req.user.id}${path.parse(file.name).ext}`;
+   request.profilePicture = file.name;
+   file.mv(`./Images/private/users/${file.name}`);
+   
   const user = await userModel.findByIdAndUpdate(req.user.id,
+    request,
     {
       runvalidate : true , 
       new : true});
@@ -75,14 +97,6 @@ const file = req.files.file;
     });
    }
 
-   /*if(file.mimetype.startsWith("image")){
-    return res.status(400).send({
-      success : false ,
-      message : "Please upload an image file  ex : jpg, jpeg, png",
-      data : []
-    });
-   }
-   */
 
 
        // if the user have a profile picture already delete it from the serveur 
@@ -176,7 +190,8 @@ exports.getallTransportors = asyncHandler(async(req, res, next) => {
  
 
 exports.sendRequest = asyncHandler(async(req, res, next)=>{
-
+//! convert the request to an object 
+let result = JSON.parse(req.body.data);
 
    const file = req.files.file ;
    if(!file){
@@ -185,13 +200,7 @@ exports.sendRequest = asyncHandler(async(req, res, next)=>{
       status : "fail",
       message : "Please add the images of the packages"
     });
-   }
-   if(! file.mimetype.startsWith("image")){
-    return res.status(404).send({
-      success : false , 
-      status : "fail",
-      message : "Please add file type image png jpeg jpg "
-    });
+    
    }
    if(file.size> 1000000){
 
@@ -200,18 +209,20 @@ exports.sendRequest = asyncHandler(async(req, res, next)=>{
       status : "fail",
       message : "Ops! size is to big "
     });
+
    }
-   file.name = `package_${res.user.id}${path.parse(file.name).ext}`;
+   file.name = `package_${req.user.id}${path.parse(file.name).ext}`;
+   
    file.mv(
        `./Images/packages/demandeimage/${file.name}`
    );
 
 
-   req.body.message.packagephoto = file.name;
+   result.message.packagephoto = file.name;
  
 
 
-   const user_demande = await demande.create(req.body, {
+   const user_demande = await demande.create(result, {
     runvalidate : true,
 
    });

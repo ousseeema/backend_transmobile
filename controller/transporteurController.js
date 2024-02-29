@@ -7,48 +7,70 @@ const demandeDelv = require('../model/demandeDelv');
 
 
 // updating user data name email
+
 exports.updateUserDetails= asyncHandler(async(req, res , next) => {
+    
+  let request = JSON.parse(req.body.data);
    
-  if(req.body.password){
-   return res.status(400).send({
-     success : false ,
-     message : "You can't update password from here",
-     data : []
-   });
+   if(req.body.data.password){
+    return res.status(400).send({
+      success : false ,
+      message : "You can't update password from here",
+      data : []
+    });
+   }
+  
+  if (!request){
+    return res.status(400).send({
+      success : false ,
+      message : "Please enter the data you want to update",
+      data : []
+    });
   }
- 
- if (!req.body){
-   return res.status(400).send({
-     success : false ,
-     message : "Please enter the data you want to update",
-     data : []
-   });
- }
+  const file = req.files.file;
+  if(!file){
+    return res.status(400).send({
+      success : false ,
+      message : "Please upload a photo",
+      data : []
+    });
+  }
 
- const transporteurs = await transporteur.findByIdAndUpdate(req.body,
-   {
-     runvalidate : true , 
-     new : true});
+  if(file.size> 1000000){
+    return res.status(400).send({
+      success : false ,
+      message : "File size should not exceed 1MB",
+      data : []
+    });
+  }
+  file.name = `transporteur_${req.user.id}${path.parse(file.name).ext}`;
+   request.profilePicture = file.name;
+   file.mv(`./Images/private/transporteurs/${file.name}`);
+   
+  const user = await userModel.findByIdAndUpdate(req.user.id,
+    request,
+    {
+      runvalidate : true , 
+      new : true});
 
- if(!transporteurs){
+  if(!user){
 
-   return res.status(404).send({
-     success : false ,
-     message : "transporteur not found",
-     data : []
-   });
+    return res.status(404).send({
+      success : false ,
+      message : "transporteur not found",
+      data : []
+    });
 
 
- }
- return res.status(200).send({
-   success : true ,
-   message : "transporteur updated successfully",
-   data : transporteurs
- })
+  }
+  return res.status(200).send({
+    success : true ,
+    message : "transporteur information updated successfully",
+    data : user
+  })
 
 
 });
-
 
 // uploading a profile picture
 

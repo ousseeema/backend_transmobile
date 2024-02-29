@@ -9,8 +9,9 @@ router.route("/getAllTransporteur").get(protect(usermodel), getallTransportors);
 router.route("/updateUserDetails").put(protect(usermodel), updateUserDetails);
 //working
 router.route("/uploadProfilePicture").put(protect(usermodel), uploadProfilePicture);
-//todo fix the reset of tghe api 
+//todo  not done yet messing testing 
 router.route("/searchtrip").get(protect(usermodel), searchForTrip);
+//working
 router.route("/sendrequest").post(protect(usermodel), sendRequest);
 //working 
 router.route("/getverified").post(protect(usermodel), getVerified);

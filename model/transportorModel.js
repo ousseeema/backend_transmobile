@@ -192,7 +192,7 @@ const TransporteurModel = mongoose.Schema({
     zipcode: String,
     country: String,
   },
-Profil_Picture : {
+  profilePicture : {
   type : String,
   default : "default.jpg",
   required : false,

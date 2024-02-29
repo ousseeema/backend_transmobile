@@ -42,7 +42,8 @@ const requestbody = mongoose.Schema({
     type : String,
     required : true,
     
-  }
+  },
+  
 
 
 
@@ -50,15 +51,19 @@ const requestbody = mongoose.Schema({
 const  demande = mongoose.Schema({
   Client :{
     type : mongoose.Schema.ObjectId,
-    required : true , 
+    ref:"user",
+    
 
   }, 
   transporter :{
 
     type : mongoose.Schema.ObjectId,
-    required : true , 
+    ref: 'transporteur',
+
+    
 
   }, 
+ 
   message : {
     type :[requestbody],
     required : true , 

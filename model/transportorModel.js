@@ -29,6 +29,7 @@ const comment = mongoose.Schema({
 
 const TransporteurModel = mongoose.Schema({
 
+  
   fullName : 
   {
   type : String,
@@ -61,17 +62,15 @@ const TransporteurModel = mongoose.Schema({
   },
   PhoneNumber_A :{
     type : String,
-    required : false ,
-    trim : true ,
-    unique : true,
+    required : false ,   
     maxlength : 20,
     minlength : 10,
   } , 
   PhoneNumber_B :{
     type : String,
     required : false ,
-    trim : true ,
-    unique : true,
+    
+    
     maxlength : 20,
     minlength :8,
 
@@ -119,13 +118,11 @@ const TransporteurModel = mongoose.Schema({
     type : String,
     required : false ,
     trim : true ,
-    unique : false,
   },
   Car_SerieNumber:{
     type : String,
     required : false ,
     trim : true ,
-    unique : true,
   },
   ListCountry_1:{
     type : [String],
@@ -196,7 +193,6 @@ const TransporteurModel = mongoose.Schema({
   type : String,
   default : "default.jpg",
   required : false,
-  unique : false,
 },
   numberofTrips : {
     type : Number,
@@ -230,6 +226,7 @@ const TransporteurModel = mongoose.Schema({
   type : String,
   default : 'Transporter',
   },
+
 
   totalRevenue : {
     type : Number,

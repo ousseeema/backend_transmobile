@@ -10,7 +10,13 @@ const { json } = require('express');
 // updating user data name email
 
 exports.updateUserDetails= asyncHandler(async(req, res , next) => {
-    
+  if(!req.body.data){
+    return res.status(404).send({
+      message : "please enter your info",
+      success : false,
+      data:[]
+    })
+  }
   let request = JSON.parse(req.body.data);
    
    if(req.body.data.password){
@@ -21,13 +27,7 @@ exports.updateUserDetails= asyncHandler(async(req, res , next) => {
     });
    }
   
-  if (!request){
-    return res.status(400).send({
-      success : false ,
-      message : "Please enter the data you want to update",
-      data : []
-    });
-  }
+  
   const file = req.files.file;
   if(!file){
     return res.status(400).send({
@@ -118,7 +118,7 @@ const file = req.files.file;
        }
      
    // upload the new profile picture on the serveur 
-   file.name = `photo_${req.user.id}${path.parse(file.name).ext}`;
+   file.name = `user_${req.user.id}${path.parse(file.name).ext}`;
     file.mv(
     `./Images/private/users/${file.name}`,
      
@@ -191,6 +191,13 @@ exports.getallTransportors = asyncHandler(async(req, res, next) => {
 
 exports.sendRequest = asyncHandler(async(req, res, next)=>{
 //! convert the request to an object 
+if(!req.body.data){
+  return res.status(404).send({
+    message : "please enter the info request",
+    success : false,
+    data:[]
+  })
+}
 let result = JSON.parse(req.body.data);
 
    const file = req.files.file ;
@@ -248,6 +255,13 @@ let result = JSON.parse(req.body.data);
 
 
 exports.getVerified = asyncHandler(async(req, res ,next)=>{
+  if(!req.body.data){
+    return res.status(404).send({
+      message : "please enter your info",
+      success : false,
+      data:[]
+    });
+  }
 //! convert the req to an object because it came in String format 
 let result = JSON.parse(req.body.data);
 //! adding the client id to the object 

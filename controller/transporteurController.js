@@ -3,13 +3,19 @@ const transporteur = require('../model/transportorModel');
 const fs = require("fs");
 const tripModel =require('../model/tripModel');
 const demandeDelv = require('../model/demandeDelv');
-
+const path = require("path");
 
 
 // updating user data name email
 
 exports.updateUserDetails= asyncHandler(async(req, res , next) => {
-    
+    if(!req.body.data){
+      return res.status(404).send({
+        message : "please enter your info",
+        success : false,
+        data:[]
+      })
+    }
   let request = JSON.parse(req.body.data);
    
    if(req.body.data.password){
@@ -20,13 +26,7 @@ exports.updateUserDetails= asyncHandler(async(req, res , next) => {
     });
    }
   
-  if (!request){
-    return res.status(400).send({
-      success : false ,
-      message : "Please enter the data you want to update",
-      data : []
-    });
-  }
+  
   const file = req.files.file;
   if(!file){
     return res.status(400).send({
@@ -42,18 +42,20 @@ exports.updateUserDetails= asyncHandler(async(req, res , next) => {
       message : "File size should not exceed 1MB",
       data : []
     });
+
   }
   file.name = `transporteur_${req.user.id}${path.parse(file.name).ext}`;
    request.profilePicture = file.name;
    file.mv(`./Images/private/transporteurs/${file.name}`);
    
-  const user = await userModel.findByIdAndUpdate(req.user.id,
+  const transporter = await transporteur.findByIdAndUpdate(req.user.id,
     request,
     {
       runvalidate : true , 
+
       new : true});
 
-  if(!user){
+  if(!transporter){
 
     return res.status(404).send({
       success : false ,
@@ -66,7 +68,7 @@ exports.updateUserDetails= asyncHandler(async(req, res , next) => {
   return res.status(200).send({
     success : true ,
     message : "transporteur information updated successfully",
-    data : user
+    data : transporter
   })
 
 
@@ -94,38 +96,32 @@ const file = req.files.file;
    });
   }
 
-  if(file.mimetype.startsWith("image")){
-   return res.status(400).send({
-     success : false ,
-     message : "Please upload an image file  ex : jpg, jpeg, png",
-     data : []
-   });
-  }
+   // if the user have a profile picture already delete it from the serveur 
+   if(req.user.profilePicture !== "default.jpg"){
+    fs.unlink(`./Images/private/transporteurs/${req.user.profilePicture}`, (err) => {
+      if (err) {
+        console.error(err)
+        return  res.status(400).send({
+          success : false ,
+          message : "error updating  picture",
+          data : []
+        });
+      }
+    });
+
+
+
+
+   }
+ 
     
   // upload the new profile picture on the serveur 
-  file.name = `photo_${req.user.id}${path.parse(file.name).ext}`;
+  file.name = `transporteur_${req.user.id}${path.parse(file.name).ext}`;
    file.mv(
    `./images/private/transporteurs/${file.name}`,
     
    );
-
-
-      // if the user have a profile picture already delete it from the serveur 
-   if(req.user.profilePicture !== "default.png"){
-     fs.unlink(`./images/private/transporteurs/${req.user.profilePicture}`, (err) => {
-       if (err) {
-         console.error(err)
-         return  res.status(400).send({
-           success : false ,
-           message : "error updating profile picture",
-           data : []
-         });
-       }
-     });
  
- 
- 
-    }
 
      // updating the new profile picture in the database 
    const transporteurs = await transporteur.findByIdAndUpdate(
@@ -214,7 +210,8 @@ exports.addTrip = asyncHandler(async(req, res, next) => {
 exports.getAlldemande = asyncHandler(async(req, res, next) => {
 
  const alldemandes = await demandeDelv.find(
-  {transporter : res.user.id}
+  {transporter : req.user.id}
+
   );
    if(!alldemandes){
 
@@ -244,7 +241,7 @@ exports.getAlldemande = asyncHandler(async(req, res, next) => {
 exports.acceptDemande = asyncHandler(async(req, res, next)=>{
   // accepting the demande and changing the attrb to true 
  const demandeaccepte = await demandeDelv.findByIdAndUpdate(
-  {client:req.body.id},
+  {_id:req.body.id},
   {
   accepted : true, 
   

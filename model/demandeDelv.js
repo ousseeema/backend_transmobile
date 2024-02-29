@@ -7,6 +7,11 @@ const requestbody = mongoose.Schema({
     trim: true,
     
   },
+  numberofkg :{
+    type : Number, 
+    required : true, 
+    trim: true,
+  },
   phoneNumberof_the_sender :{
     type : String, 
     required : true , 

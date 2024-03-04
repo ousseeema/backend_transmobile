@@ -43,6 +43,11 @@ const requestbody = mongoose.Schema({
     type : Boolean,
     default : false,
   },
+  homedeliveryAddress :{
+    type : String,
+    required : false,
+  },
+
   packagephoto :{
     type : String,
     required : true,

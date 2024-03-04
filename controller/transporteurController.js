@@ -468,8 +468,75 @@ exports.updateTrip = asyncHandler(async(req, res, next) => {
       runvalidate : true,
   
     });
+    if(!updatedTrip){
+      return res.status(404).send({
+        message : "error while updating the trip",
+        success : false,
+        status : "fail",
+        data :[]
+      });
+    }
 
-    
+
+    return res.status(200).send({
+      message : "trip updated successfuly",
+      success : true,
+      status : "success",
+      data : updatedTrip
+    });
+
+
+});
+
+
+// delete the current trip 
+exports.deleteTrip = asyncHandler(async(req, res, next)=>{
+  const tripdeleted = await tripModel.findByIdAndDelete(req.params.id);
+
+  if(!tripdeleted){
+    return res.status(404).send({
+      message : "error while deleting trip",
+      success : false, 
+      status :"fail",
+      data:[],
+    })
+  }
+
+  return res.status(200).send({
+    message : "trip deleted successfully",
+    success : true, 
+    status :"success",
+    data:[],
+  })
+
+
+});
+
+exports.addSinglePackage = asyncHandler(async(req, res, next)=>{
+
+   const package = await tripModel.findByIdAndUpdate(req.params.id,{
+    $push : {packages : req.body}
+   });
+
+    if(!package){
+      return res.status(404).send({
+        message : "error while adding package to the trip ",
+        success : false,
+        status :"fail",
+        data :[]
+      });
+    }
+
+    return res.status(200).send({
+      message : "package added to the trip successfuly",
+      success : true,
+      status :"success",
+      data :[]
+    });
+
+
+
+  
 });
 
  

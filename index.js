@@ -26,8 +26,8 @@ const deletePlanifier = require("./utils/deletePlanifie");
 // importing user model and transporteur model
 const userModel = require('./model/userModel');
 const transportModel = require('./model/transportorModel');
-deletePlanifier(userModel);
-deletePlanifier(transportModel);
+//deletePlanifier(userModel);
+//deletePlanifier(transportModel);
 
 
 

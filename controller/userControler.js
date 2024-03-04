@@ -229,9 +229,8 @@ let result = JSON.parse(req.body.data);
  
 
 
-   const user_demande = await demande.create(result, {
-    runvalidate : true,
-
+   const user_demande = await demande(result).save({
+    runvalidate : true
    });
 
    if(!user_demande){
@@ -332,6 +331,12 @@ exports.searchForTrip = asyncHandler(async(req,  res, next)=>{
 
     // Copy the req.query object
     const reqQuery = { ...req.query };
+
+
+
+
+
+    
 
     // Fields to exclude from filtering
     const removeFields = ["select", "sort"];

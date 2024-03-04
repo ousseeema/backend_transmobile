@@ -9,17 +9,18 @@ const {addTrip,updateUserDetails,uploadProfilePicture, acceptDemande, refusedema
 router.route("/updateTransporteurDetails").put(protect(transporteur), updateUserDetails);
 //working
 router.route("/uploadProfilePicture").post(protect(transporteur), uploadProfilePicture);
-
+//working
 router.route("/getAllPackage").get(protect(transporteur), getAllPackage_forSingleTrip);
-//
-router.route("/acceptDemande").put(protect(transporteur), acceptDemande);
-//
-router.route("/refuseDemande").put(protect(transporteur), refusedemande);
+// working 
+router.route("/acceptDemande/:id").put(protect(transporteur), acceptDemande);
+//working
+router.route("/refuseDemande/:id").put(protect(transporteur), refusedemande);
 //working
 router.route("/getAllDemande").get(protect(transporteur), getAlldemande);
-//
-router.route("/addtrip").all(protect(transporteur), addTrip);
-
+//working
+router.route("/addtrip").post(protect(transporteur), addTrip);
+// 
+router.route('/updateTrip').put(protect(transporteur), updateTrip);
 
 module.exports = router ;
 

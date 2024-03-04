@@ -70,15 +70,16 @@ const  demande = mongoose.Schema({
   }, 
  
   message : {
-    type :[requestbody],
+    type :requestbody,
     required : true , 
   },
-  accepted : {
-   type : Boolean, 
-  
+  accepted:{
+    type : Boolean,
+    default : false,
   },
-  refuse :{
-    type: Boolean,
+  refused:{
+    type : Boolean,
+    default : false,
   },
    
   createdAt : {

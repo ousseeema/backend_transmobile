@@ -4,6 +4,7 @@ const fs = require("fs");
 const tripModel =require('../model/tripModel');
 const demandeDelv = require('../model/demandeDelv');
 const path = require("path");
+const { default: mongoose } = require('mongoose');
 
 
 // updating user data name email
@@ -153,26 +154,12 @@ const file = req.files.file;
 
 exports.addTrip = asyncHandler(async(req, res, next) => {
 // test if the transporter has already been added a trip 
-  const test = await tripModel.findById(
-    res.user.id,
-    ).where({
-    isDone : false,
-  });
+  const test = await tripModel.findOne(
+   {transporter: req.user.id,
+    isDone : false}
+    );
   if(test){
-    return res.status(203).send({
-      status : "fail",
-      success : false ,
-      message : 'You cannot add trip twice ',
-    })
-
-  }
-  
-     // crating a new trip with the details 
-    const trip= await tripModel.create(req.body, {
-     runvalidate : true
-  });
-
-  if(!trip){
+    
     return res.status(203).send({
       status : "fail",
       success : false ,
@@ -181,8 +168,12 @@ exports.addTrip = asyncHandler(async(req, res, next) => {
 
   }
   // adding +1 for every trip add successfully
-  const transporter = await transporteur.findByIdAndUpdate({_id : req.user.id},
-    { $inc: {numberofTrips : 1} }
+  const transporter = await transporteur.findByIdAndUpdate({
+    _id : req.user.id
+  },
+    { $inc: {numberofTrips : 1} },
+    
+    
     );
     if(!transporter){
       return res.status(400).send({
@@ -192,10 +183,26 @@ exports.addTrip = asyncHandler(async(req, res, next) => {
        data :[]
       });
      }
+   
+     req.body.transporter = req.user.id;
+     // crating a new trip with the details 
+    const trip= await tripModel(req.body);
+    trip.save({
+      runvalidate : true,
+    });
+
   
+  if(!trip){
+    return res.status(203).send({
+      status : "fail",
+      success : false ,
+      message : 'You cannot add trip twice',
+    })
 
-
-  res.status(200).send({
+  }
+  
+   
+ return res.status(200).send({
     success : true , 
     status: "success", 
     message : "You have posted a trip successfuly"
@@ -241,11 +248,10 @@ exports.getAlldemande = asyncHandler(async(req, res, next) => {
 exports.acceptDemande = asyncHandler(async(req, res, next)=>{
   // accepting the demande and changing the attrb to true 
  const demandeaccepte = await demandeDelv.findByIdAndUpdate(
-  {_id:req.body.id},
+  {_id: req.params.id },
   {
   accepted : true, 
-  
- });
+ });                                         
 
  if(!demandeaccepte){
 
@@ -257,9 +263,14 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
   });
  }
 
+   // ! calculating the amount and adding it to the transporter revenu 
+   const amount = demandeaccepte.numberofkg * req.user.price_kg;
+
+
+
 
  const transporter = await transporteur.findByIdAndUpdate({_id : req.user.id},
-  { $inc: {numberofPackages : 1, numberofClient : 1} }
+  { $inc: {numberofPackages : 1, numberofClients : 1, totalRevenue: amount} }
   );
   if(!transporter){
     return res.status(400).send({
@@ -271,12 +282,15 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
    }
 
 // adding the package to the trip
- const addPackageTo_theTrip = await tripModel.findById(
+ const addPackageTo_theTrip = await tripModel.findOne(
   {
-    transporter: demandeaccepte.transporter,
+    transporter: req.user.id,
+    isDone : false   ,
+    
   },
+
  
- ).where(isDone == false);
+ );
 
 
 
@@ -289,22 +303,12 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
   });
  }
 
+
    addPackageTo_theTrip.packages.push(demandeaccepte);
    addPackageTo_theTrip.save();
  
 
-   // adding +1 every time a new package add 
-   const transport = await transporteur.findByIdAndUpdate({_id : req.user.id},
-    { $inc: {numberofPackages : 1, numberofClient : 1} }
-    );
-    if(!transport){
-      return res.status(400).send({
-        message : "error while adding package to the trip ",
-        status :"fail",
-        success : false,
-       data :[]
-      });
-     }
+
 
 
    return res.status(200).send({
@@ -319,9 +323,9 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
 exports.refusedemande = asyncHandler(async(req, res, next)=>{
  
   const refuse = await demandeDelv.findByIdAndUpdate({
-    id : req.body.id,
+    _id : req.params.id,
   }, 
-  {  refuse : true,
+  {  refused : true,
   },  );
 
 
@@ -353,10 +357,11 @@ exports.refusedemande = asyncHandler(async(req, res, next)=>{
 // get all packages for the current trip 
 exports.getAllPackage_forSingleTrip = asyncHandler(async(req, res ,next)=>{
 
-  const allPackage = await tripModel.find({
-    transporter : res.user.id,
+  const allPackage = await tripModel.findOne({
+    transporter : req.user.id,
     isDone : false ,
   });
+
   if(!allPackage){
     return res.status(404).send({
       message : "No trip for the moment", 
@@ -365,12 +370,13 @@ exports.getAllPackage_forSingleTrip = asyncHandler(async(req, res ,next)=>{
       data : []
     });
   }
+
   // todo fix the problem of resending the photo of the package from the serveur to the user 
   return res.status(200).send({
     message : "List of packages for this trip", 
     status : "success",
     success : true,
-    data : allPackage
+    data : allPackage.packages
   });
 
 });
@@ -449,6 +455,21 @@ exports.getVerified = asyncHandler(async(req, res ,next)=>{
     });
 
 
+});
+
+
+
+// update trip
+exports.updateTrip = asyncHandler(async(req, res, next) => {
+  
+  const updatedTrip = await tripModel.findByIdAndUpdate(req.params.id, 
+    req.body,
+    { 
+      runvalidate : true,
+  
+    });
+
+    
 });
 
  

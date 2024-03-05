@@ -619,7 +619,9 @@ const trip = await tripModel.findByIdAndUpdate(req.params.id,
 
      return res.status(200).send({
       success : true, 
-      message : ""
+      message : "List of trips in the way",
+      status : "success",
+      data : listofTrip
      })
 
 

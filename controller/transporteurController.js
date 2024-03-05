@@ -4,8 +4,7 @@ const fs = require("fs");
 const tripModel =require('../model/tripModel');
 const demandeDelv = require('../model/demandeDelv');
 const path = require("path");
-const { default: mongoose } = require('mongoose');
-
+const historymodel = require("../model/historyTrip");
 
 // updating user data name email
 
@@ -282,15 +281,10 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
    }
 
 // adding the package to the trip
- const addPackageTo_theTrip = await tripModel.findOne(
-  {
-    transporter: req.user.id,
-    isDone : false   ,
-    
-  },
-
- 
- );
+ const addPackageTo_theTrip = await tripModel.findByIdAndUpdate(req.params.id,{
+  $push : {packages : demandeaccepte},
+  $inc : {numberofpackage :1}
+ });
 
 
 
@@ -302,14 +296,6 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
    data :[]
   });
  }
-
-
-   addPackageTo_theTrip.packages.push(demandeaccepte);
-   addPackageTo_theTrip.save();
- 
-
-
-
 
    return res.status(200).send({
     message : "demande accepted and package add to the List successfuly",
@@ -466,6 +452,7 @@ exports.updateTrip = asyncHandler(async(req, res, next) => {
     req.body,
     { 
       runvalidate : true,
+      new :true
   
     });
     if(!updatedTrip){
@@ -513,9 +500,13 @@ exports.deleteTrip = asyncHandler(async(req, res, next)=>{
 });
 
 exports.addSinglePackage = asyncHandler(async(req, res, next)=>{
-
-   const package = await tripModel.findByIdAndUpdate(req.params.id,{
-    $push : {packages : req.body}
+    
+  //! add a default photo to the package beacuse the transporter 
+  //!is the one that add this package with no photo
+      req.body.packageohoto = "default.png";
+  const package = await tripModel.findByIdAndUpdate(req.params.id,{
+    $push : {packages : req.body},
+    $inc : {numberofpackage :1}
    });
 
     if(!package){
@@ -526,6 +517,22 @@ exports.addSinglePackage = asyncHandler(async(req, res, next)=>{
         data :[]
       });
     }
+    //! calculate the revenu of the package and add to the data base
+    const amount =  req.user.price_kg * req.body.numberofkg;
+    const transporterupdate = await transporteur.findByIdAndUpdate(req.user.id,
+      {
+        $inc :{numberofPackages : 1, numberofClients : 1, totalRevenue: amount}
+
+      });
+      if(!transporterupdate){
+        return res.status(404).send({
+          message : "user not found to update ",
+          success : false ,
+          status : 'fail',
+          data:[]
+        })
+      }
+
 
     return res.status(200).send({
       message : "package added to the trip successfuly",
@@ -538,5 +545,85 @@ exports.addSinglePackage = asyncHandler(async(req, res, next)=>{
 
   
 });
+// add trip to the history when the trip ends 
+exports.addTripToHistory = asyncHandler(async(req, res, next)=>{
+
+const trip = await tripModel.findByIdAndUpdate(req.params.id,
+  {
+    isDone : true,
+  });
+  if(!trip){
+    return res.status(404).send({
+      message: "trip not found to update",
+      status: 'fail',
+      success : false,
+      data:[]
+
+    });
+  }
+  
+
+  const history = await historymodel.create({
+    transporter:trip.transporter,
+    Citys: trip.Citys, 
+    Home_pick_up: trip.Home_pick_up,  
+    Home_delivery: trip. Home_delivery , 
+    packages: trip.packages ,
+    isDone: trip.isDone ,
+    createdAt : trip.createdAt
+  });
+   
+
+   if(!history){
+    return res.status(404).send({
+      message  : "cannot add trip to history",
+      success : false,
+      status : 'fail',
+      data:[]
+    });
+   }
+
+
+   const deletetrip = await tripModel.findByIdAndDelete(req.params.id);
+   if(!deletetrip){
+    return res.status(404).send({
+      message : " error while deleting trip but add to the history list"
+       ,success : false ,
+    });
+   }
+
+
+   return res.status(200).send({
+    message : "trip add to the history list in your settings successfuly",
+    status : "sucess",
+    success : true ,
+    data:[]
+
+   });
+  })
+
+
+  //  get historique list for current transporter
+  exports.gethistorylist = asyncHandler(async(req, res, next)=>{
+     const listofTrip = await historymodel.find({
+      transporter: req.params.id
+     });
+     if(!listofTrip){
+      return res.status(404).send({
+        success : false, 
+        message : "error while getting history list",
+        status : "fail",
+        data:[]
+      });
+     }
+
+     return res.status(200).send({
+      success : true, 
+      message : ""
+     })
+
+
+
+  })
 
  

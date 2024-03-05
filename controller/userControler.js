@@ -389,7 +389,7 @@ exports.searchForTrip = asyncHandler(async(req,  res, next)=>{
 
   
 
-// ajputer un commntaire et review pour un transporteur
+// ajouter un commntaire et review pour un transporteur
 exports.addComment =asyncHandler(async(req, res, next)=>{})
 
 

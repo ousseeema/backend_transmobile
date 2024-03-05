@@ -32,7 +32,7 @@ exports.protect = (model)=> asynchandller(async(req, res, next)=>{
     if(!user){
       return res.status(404).send({
         success : false ,
-        message : "User not found4",
+        message : "User not found",
         data : [],
       })
     }

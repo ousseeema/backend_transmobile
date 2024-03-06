@@ -80,11 +80,10 @@ const  demande = mongoose.Schema({
   },
   accepted:{
     type : Boolean,
-    default : false,
   },
   refused:{
     type : Boolean,
-    default : false,
+   
   },
    
   createdAt : {

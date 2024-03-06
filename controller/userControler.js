@@ -186,9 +186,6 @@ exports.getallTransportors = asyncHandler(async(req, res, next) => {
 
 
 // send a request to the transporter to accepot the package
-
- 
-
 exports.sendRequest = asyncHandler(async(req, res, next)=>{
 //! convert the request to an object 
 if(!req.body.data){
@@ -252,7 +249,7 @@ let result = JSON.parse(req.body.data);
    });
 });
 
-
+// getting verifed with sending the passports image to the admin 
 exports.getVerified = asyncHandler(async(req, res ,next)=>{
   if(!req.body.data){
     return res.status(404).send({
@@ -389,7 +386,94 @@ exports.searchForTrip = asyncHandler(async(req,  res, next)=>{
 
   
 
-// ajouter un commntaire et review pour un transporteur
-exports.addComment =asyncHandler(async(req, res, next)=>{})
+// ajouter un  review pour un transporteur
+exports.addReview =asyncHandler(async(req, res, next)=>{
+  const {fullname, message, rating , } = req.body
+   if(!fullname || !message || !rating){
+    return res.status(404).send({
+      message :" please enter your full review ",
+      success : false,
+      status : "fail",
+      data :[]
+    });
+   }
+   const comment = await transporteur.findByIdAndUpdate(
+    {
+      _id: req.params.id,
+    },
+    {
+      $push : {comments : req.body},
+    },
+    {
+      runvalidater:true,
+      new: true 
+    }
+    
+   );
+   
+
+   if(!comment){
+    return res.status(404).send({
+      success: true , 
+      status: "fail", 
+      message : "Ops! error while adding your review , Please try again later",
+      data : []
+
+    });
+   }
+
+
+   return res.status(200).send({
+    message :" Thanks , Your review has been add successfully",
+    success: true,
+    status : "success",
+    data:  {
+      "fullname": fullname,
+      "message":message,
+      "rating":rating,
+      "createdAt": comment.createdAt
+    }
+   })
+
+
+
+
+
+});
+
+
+
+// get all demande that user has sent it to transporters 
+exports.getalldemande = asyncHandler(async(req, res, next )=>{
+
+
+   // getting the demande 
+   const demandes = await demande.find({
+    Client: req.params.id
+
+   });
+
+   if(!demandes){
+
+    return res.status(404).send({
+      success : false,
+      status : "fail",
+      message :" Ops! error while getting your demandes , please try again later ",
+       data :[]
+    })
+   }
+
+   return res.status(200).send({
+    count : demandes.length,
+    success : true , 
+    status : "success",
+   message : "  Done getting your demandes", 
+   data : demandes
+
+   })
+
+
+
+})
 
 

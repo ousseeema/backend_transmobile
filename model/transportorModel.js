@@ -18,6 +18,8 @@ const comment = mongoose.Schema({
   rating :{
     type : Number , 
     default : 0,
+    max :5,
+    min: 0,
     required : [true , "please add a rating to the transporter"]
   },
   createdAt :{
@@ -273,13 +275,9 @@ const TransporteurModel = mongoose.Schema({
     default : undefined,
   }, 
   comments :{
-    type :[{
-      type : [comment], 
-      required : false , 
-     
-    }]
+    type :[comment]
   },
-  //demandeOfDelivery:
+  
 
  
 

@@ -44,6 +44,7 @@ const userModel = mongoose.Schema({
     required : [true, "Please enter your password"] ,
     trim : true ,
     unique : false,
+    minlength:[8, "Password must be at least 8 characters long"],
     select : false,
   },
   Role:{

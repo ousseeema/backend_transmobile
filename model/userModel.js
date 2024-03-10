@@ -52,7 +52,11 @@ const userModel = mongoose.Schema({
     default : 'Client',
     },
 
- 
+    fulladdress :{
+      type : String ,
+      trim: true ,
+      
+    },
   numberofPackagesSended : {
     type : Number,
     default : 0,

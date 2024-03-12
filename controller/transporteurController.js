@@ -9,16 +9,15 @@ const historymodel = require("../model/historyTrip");
 // updating user data name email
 
 exports.updateUserDetails= asyncHandler(async(req, res , next) => {
-    if(!req.body.data){
+    if(!req.body){
       return res.status(404).send({
         message : "please enter your info",
         success : false,
         data:[]
       })
     }
-  let request = JSON.parse(req.body.data);
    
-   if(req.body.data.password){
+   if(req.body.password){
     return res.status(400).send({
       success : false ,
       message : "You can't update password from here",
@@ -26,30 +25,12 @@ exports.updateUserDetails= asyncHandler(async(req, res , next) => {
     });
    }
   
+ 
+
+
   
-  const file = req.files.file;
-  if(!file){
-    return res.status(400).send({
-      success : false ,
-      message : "Please upload a photo",
-      data : []
-    });
-  }
-
-  if(file.size> 1000000){
-    return res.status(400).send({
-      success : false ,
-      message : "File size should not exceed 1MB",
-      data : []
-    });
-
-  }
-  file.name = `transporteur_${req.user.id}${path.parse(file.name).ext}`;
-   request.profilePicture = file.name;
-   file.mv(`./Images/private/transporteurs/${file.name}`);
-   
   const transporter = await transporteur.findByIdAndUpdate(req.user.id,
-    request,
+    req.body,
     {
       runvalidate : true , 
 

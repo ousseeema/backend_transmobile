@@ -9,11 +9,11 @@ router.route("/signup1").post(sign_up_1(transporteurModel));
 //working
 router.route("/signup2").post(sign_up_2(transporteurModel));
 //working
-router.route("/forgotpassword").post(forgotpassword(transporteurModel));
+router.route("/forgotpassword").put(forgotpassword(transporteurModel));
 //working
-router.route("/resetpassword").post(resetpassword(transporteurModel));
+router.route("/resetpassword").put(resetpassword(transporteurModel));
 //working
-router.route("/resendverificationcode").post(resendVerificationCode(transporteurModel));
+router.route("/resendverificationcode").put(resendVerificationCode(transporteurModel));
 
 
 

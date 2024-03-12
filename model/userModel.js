@@ -33,10 +33,17 @@ const userModel = mongoose.Schema({
   },
   Phone_Number:{
      type : String ,
-      required : false ,
+      required : true ,
       trim : true ,
-      maxlength : [20,'Phone number can not be longer than 20 characters'],
-      minlength:[8,'Phone number can not be longer than 8 characters'],
+      maxlength : [15,'Phone number can not be longer than 15 characters'],
+      minlength:[6,'Phone number can not be longer than 8 characters'],
+  },
+  Phone_Number2:{
+    type : String ,
+    required : true ,
+    trim : true ,
+    maxlength : [15,'Phone number can not be longer than 15 characters'],
+    minlength:[6,'Phone number can not be longer than 6 characters'],
   },
 
   password : {
@@ -52,7 +59,7 @@ const userModel = mongoose.Schema({
     default : 'Client',
     },
 
-    fulladdress :{
+   fulladdress :{
       type : String ,
       trim: true ,
       

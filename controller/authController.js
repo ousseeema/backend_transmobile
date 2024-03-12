@@ -4,9 +4,65 @@ const asynchandler = require("../middleware/asynchandller");
 const sendemail = require("../utils/mailtrapper");
 const crypto = require("crypto");
 const secret = "zui87fze69f8z9f7zef74ef";
+const clientmodel=  require("../model/userModel");
+const transportermodel =require("../model/transportorModel");
 exports.sign_up_1 = (model) =>
   asynchandler(async (req, res, next) => {
-    const user = await model.create(req.body);
+
+    if(!req.body.data){
+      return res.status(404).send({
+        message : "please enter your info",
+        success : false,
+        data:[]
+      })
+    }
+  let request = JSON.parse(req.body.data);
+   
+   if(req.body.data.password){
+    return res.status(400).send({
+      success : false ,
+      message : "You can't update password from here",
+      data : []
+    });
+   }
+
+
+   
+  const file = req.files.file;
+  if(!file){
+    return res.status(400).send({
+      success : false ,
+      message : "Please upload a photo",
+      data : []
+    });
+  }
+
+  if(file.size> 1000000){
+    return res.status(400).send({
+      success : false ,
+      message : "File size should not exceed 1MB",
+      data : []
+    });
+
+  }
+    let who ;
+  if(model ===clientmodel ){
+   who = "users"
+  }
+  else if(model=== transportermodel){
+    who="transporteurs";
+  }
+
+  file.name = `${who}_${req.user.id}${path.parse(file.name).ext}`;
+   request.profilePicture = file.name;
+   file.mv(`./Images/private/${who}/${file.name}`);
+
+
+
+     
+
+
+    const user = await model.create(request);
 
     if (!user) {
       return res.status(400).json({
@@ -67,7 +123,7 @@ exports.sign_up_2 = (model) =>
     // if verification code is not valid the user will have the chance to re enter the code
     if (!user) {
       return res.status(400).send({
-        status: "error in the code",
+        status: "fail",
 
         success: false,
         message: "invalid verification code, try again",
@@ -80,24 +136,19 @@ exports.sign_up_2 = (model) =>
     // send a response back to the user to create another account
 
     if (user.verification_code_expire < Date.now()) {
-      const delete_user = await model.findOneAndDelete({
-        verification_code: req.body.verification_code,
-      });
-
+    
       return res.status(400).send({
-        status: "Date has expired",
+        status: "fail",
         success: false,
         message:
-          "verification code expired, try creating another account again",
+          "verification code expired, try sending another code",
         data: [],
         token: null,
       });
     }
 
     //creating jwt token for the logged user
-    const token = jwt.sign({ id: user._id }, secret, {
-      expiresIn: "15d",
-    });
+    const token = jwt.sign({ id: user._id }, secret);
     // if the verification code is correct and the time has not expired then  remove the verification code and the
     // time to expire from the account info
     const newuser = await model.findOneAndUpdate(

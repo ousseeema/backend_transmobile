@@ -64,13 +64,13 @@ const TransporteurModel = mongoose.Schema({
   },
   PhoneNumber_A :{
     type : String,
-    required : false ,   
+    required : true ,   
     maxlength : 20,
     minlength : 10,
   } , 
   PhoneNumber_B :{
     type : String,
-    required : false ,
+    required : true ,
     
     
     maxlength : 20,
@@ -78,58 +78,37 @@ const TransporteurModel = mongoose.Schema({
 
   },
 
-  Place_A: {
+  DestinationAddress: {
     type: {
       type: String,
-      enum: ["Point"],
-     //required: [true, 'please enter location ']
+      required: [true, 'please enter location ']
     },
-    coordinates: {
-      type: [Number],
-       // required: true,
-      index: "2dsphere",
-    },
-    formattedAddress: String,
-    Street: String,
-    city: String,
-    state: String,
-    zipcode: String,
-    country: String,
+   
   },
-  Place_B: {
+  localAddress: {
     type: {
       type: String,
-      enum: ["Point"],
-     //required: [true, 'please enter location ']
+      
+     required: [true, 'please enter location ']
     },
-    coordinates: {
-      type: [Number],
-       // required: true,
-      index: "2dsphere",
-    },
-    formattedAddress: String,
-    Street: String,
-    city: String,
-    state: String,
-    zipcode: String,
-    country: String,
+    
   },
 
 
   Car_Brand :{
     type : String,
-    required : false ,
+    required : true ,
     trim : true ,
   },
   Car_SerieNumber:{
     type : String,
-    required : false ,
+    required : true ,
     trim : true ,
   },
   ListCountry_1:{
     type : [String],
     
-    required : false,
+    required : true,
     enum :[ "France", "Germany", "Italy", "Spain", "Portugal", "Belgium", "Netherlands",  "Switzerland", "United Kingdom", "Ireland", "Denmark", "Norway", "Sweden"],
     trim : true ,
     unique : false,
@@ -138,7 +117,7 @@ const TransporteurModel = mongoose.Schema({
   ListCountry_2:{
     type : [String],
     
-    required : false,
+    required : true,
     enum:["Algeria", "Tunisia", "Morocco","Libya"],
     trim : true ,
     unique : false,
@@ -146,55 +125,43 @@ const TransporteurModel = mongoose.Schema({
 
   HomePickUps :{
     type : Boolean,
-    required : false,
+    required : true,
    
   },
   HomeDelivery :{
 
     type : Boolean,
-    required :false,
+    required :true,
    
     
 
   },
   price_kg :{
    type : Number,
-   required : false , 
+   required : true , 
    default: 0, 
 
   },
   Parsols:{
 
     type : Boolean,
-    required : false,
+    required : true,
 
   },
   Parsols_Site:{
+    required : false,
     type: [String],
-    enum:["Amazon", "Ebay","Ali Express","Shein","temu" ,"Autre"],
+    enum:["Amazon", "Ebay","Ali Express","Shein","temu" ,"Autres"],
   },
   Adresse_Parsols: {
     type: {
       type: String,
-      enum: ["Point"],
      required: false
     },
-    coordinates: {
-      type: [Number],
-       // required: true,
-      index: "2dsphere",
-    },
-    formattedAddress: String,
-    Street: String,
-    city: String,
-    state: String,
-    zipcode: String,
-    country: String,
-  },
+     },
   profilePicture : {
   type : String,
-  default : "default.jpg",
-  required : false,
+  required : true,
 },
   numberofTrips : {
     type : Number,
@@ -215,15 +182,7 @@ const TransporteurModel = mongoose.Schema({
     required : false,
  
   },
-  LocalAdresse : {
-    type : String,
-    default : "",
-    required : false,
-    trim : true ,
-    unique : false,
-  },
-
-
+  
   Role:{
   type : String,
   default : 'Transporter',

@@ -587,7 +587,7 @@ const trip = await tripModel.findByIdAndUpdate(req.params.id,
   //  get historique list for current transporter
   exports.gethistorylist = asyncHandler(async(req, res, next)=>{
      const listofTrip = await historymodel.find({
-      transporter: req.params.id
+      transporter: req.user.id
      });
      if(!listofTrip){
       return res.status(404).send({

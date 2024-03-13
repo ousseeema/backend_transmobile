@@ -106,7 +106,7 @@ const TransporteurModel = mongoose.Schema({
     trim : true ,
   },
   ListCountry_1:{
-    type : [String],
+    type :String,
     
     required : true,
     enum :[ "France", "Germany", "Italy", "Spain", "Portugal", "Belgium", "Netherlands",  "Switzerland", "United Kingdom", "Ireland", "Denmark", "Norway", "Sweden"],
@@ -115,7 +115,7 @@ const TransporteurModel = mongoose.Schema({
   },
   
   ListCountry_2:{
-    type : [String],
+    type : String,
     
     required : true,
     enum:["Algeria", "Tunisia", "Morocco","Libya"],

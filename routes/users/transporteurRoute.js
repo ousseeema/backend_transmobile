@@ -26,7 +26,7 @@ router.route("/deleteTrip/:id").delete(protect(transporteur), deleteTrip);
 //working 
 router.route("/addSinglepackage/:id").put(protect(transporteur), addSinglePackage);
 //working
-router.route("/getAlltrips/:id").get(protect(transporteur),gethistorylist );
+router.route("/getAlltrips").get(protect(transporteur),gethistorylist );
 // working
 router.route("/addtriptohistory/:id").put(protect(transporteur),addTripToHistory);
 module.exports = router ;

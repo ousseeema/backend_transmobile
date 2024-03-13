@@ -1,21 +1,19 @@
 const errorhandler = (err,req, res, next) => {
-  console.log(err.message);
- 
   if (err.name === "CastError") {
-    res.send({ message: ` resource not found ` });
+    res.status(400).send({ message: ` resource not found ` });
   }
   else if (err.code === 11000) {
-    res.send({ message: "Duplicate key entered" });
+    res.status(400).send({ message: "User already existe with this email address" });
   }
   else if (err.name === "ValidationError") {
     
-    const messages = Object.values(err.errors).map((val) => val.message);
-      res.status(400).send({success: false, message:messages})
+    
+      res.status(400).send({success: false, message:"check your input fields , there is missing field"})
   }
   else if(err.name==="SyntaxError"){
     res.status(400).send({
       success : false,
-      message: "error syntax in the body"
+      message: " syntax error in the data you submitted"
     });
     
   }

@@ -4,63 +4,68 @@ const asynchandler = require("../middleware/asynchandller");
 const sendemail = require("../utils/mailtrapper");
 const crypto = require("crypto");
 const secret = "zui87fze69f8z9f7zef74ef";
-const clientmodel=  require("../model/userModel");
-const transportermodel =require("../model/transportorModel");
+const clientmodel = require("../model/userModel");
+const transportermodel = require("../model/transportorModel");
+const path = require("path");
 exports.sign_up_1 = (model) =>
   asynchandler(async (req, res, next) => {
-
-    if(!req.body.data){
+    if (!req.body.data) {
       return res.status(404).send({
-        message : "please enter your info",
-        success : false,
-        data:[]
-      })
+        message: "please enter your info",
+        success: false,
+        data: [],
+      });
     }
-  let request = JSON.parse(req.body.data);
-   
-   if(req.body.data.password){
-    return res.status(400).send({
-      success : false ,
-      message : "You can't update password from here",
-      data : []
-    });
-   }
+    let request = JSON.parse(req.body.data);
 
+    //! testing if there is any user in the client side or the trans side have the same email that the new user entered
+    if (model === clientmodel) {
+      const testemail = await transportermodel.findOne({
+        email: request.email,
+      });
+      if (testemail) {
+        return res.status(404).send({
+          message: "user with this email already in the transporter side",
+          success: false,
+        });
+      }
+    } else if (model === transportermodel) {
+      const testemail = await clientmodel.findOne({ email: request.email });
+      if (testemail) {
+        return res.status(404).send({
+          success: false,
+          message: "user with this email already in the client side",
+        });
+      }
+    }
 
-   
-  const file = req.files.file;
-  if(!file){
-    return res.status(400).send({
-      success : false ,
-      message : "Please upload a photo",
-      data : []
-    });
-  }
+    const file = req.files.file;
 
-  if(file.size> 1000000){
-    return res.status(400).send({
-      success : false ,
-      message : "File size should not exceed 1MB",
-      data : []
-    });
+    if (!file) {
+      return res.status(400).send({
+        success: false,
+        message: "Please upload a photo",
+        data: [],
+      });
+    }
 
-  }
-    let who ;
-  if(model ===clientmodel ){
-   who = "users"
-  }
-  else if(model=== transportermodel){
-    who="transporteurs";
-  }
+    if (file.size > 1000000) {
+      return res.status(400).send({
+        success: false,
+        message: "File size should not exceed 1MB",
+        data: [],
+      });
+    }
+    let who;
+    if (model === clientmodel) {
+      who = "users";
+    } else if (model === transportermodel) {
+      who = "transporteurs";
+    }
 
-  file.name = `${who}_${req.user.id}${path.parse(file.name).ext}`;
-   request.profilePicture = file.name;
-   file.mv(`./Images/private/${who}/${file.name}`);
-
-
-
-     
-
+    file.name = `${who}_${request.fullName}${path.parse(file.name).ext}`;
+    request.profilePicture = file.name;
+    file.mv(`./Images/private/${who}/${file.name}`);
 
     const user = await model.create(request);
 
@@ -82,7 +87,7 @@ exports.sign_up_1 = (model) =>
 
     // options to pass to the sendemail function
     const options = {
-      emailto: req.body.email,
+      emailto: user.email,
       subject: "Account Verification",
       text: `dear ${req.body.fullname} enter this code to verifie your email ${verification_code}`,
     };
@@ -136,12 +141,10 @@ exports.sign_up_2 = (model) =>
     // send a response back to the user to create another account
 
     if (user.verification_code_expire < Date.now()) {
-    
       return res.status(400).send({
         status: "fail",
         success: false,
-        message:
-          "verification code expired, try sending another code",
+        message: "verification code expired, try sending another code",
         data: [],
         token: null,
       });
@@ -225,11 +228,11 @@ exports.signin = (model) =>
     }
   });
 
-// api end point for sending reset password token to the email of the user 
+// api end point for sending reset password token to the email of the user
 exports.forgotpassword = (model) =>
   asynchandler(async (req, res, next) => {
     const { email } = req.body;
-        
+
     const user = await model.findOne({ email: email });
 
     if (!user) {
@@ -280,8 +283,7 @@ exports.forgotpassword = (model) =>
     }
   });
 
-
-  // api end point for resetpassword with the new password 
+// api end point for resetpassword with the new password
 exports.resetpassword = (model) =>
   asynchandler(async (req, res, next) => {
     const { newpassword, resettoken } = req.body;
@@ -389,5 +391,3 @@ exports.resendVerificationCode = (model) =>
       });
     }
   });
-
-

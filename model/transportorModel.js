@@ -65,8 +65,8 @@ const TransporteurModel = mongoose.Schema({
   PhoneNumber_A :{
     type : String,
     required : true ,   
-    maxlength : 20,
-    minlength : 10,
+    maxlength : 15,
+    minlength : 5,
   } , 
   PhoneNumber_B :{
     type : String,
@@ -74,14 +74,14 @@ const TransporteurModel = mongoose.Schema({
     
     
     maxlength : 20,
-    minlength :8,
+    minlength :5,
 
   },
 
   DestinationAddress: {
     type: {
       type: String,
-      required: [true, 'please enter location ']
+     // required: [true, 'please enter location ']
     },
    
   },
@@ -89,7 +89,7 @@ const TransporteurModel = mongoose.Schema({
     type: {
       type: String,
       
-     required: [true, 'please enter location ']
+   //  required: [true, 'please enter location ']
     },
     
   },
@@ -106,10 +106,11 @@ const TransporteurModel = mongoose.Schema({
     trim : true ,
   },
   ListCountry_1:{
+
     type :String,
     
     required : true,
-    enum :[ "France", "Germany", "Italy", "Spain", "Portugal", "Belgium", "Netherlands",  "Switzerland", "United Kingdom", "Ireland", "Denmark", "Norway", "Sweden"],
+    enum :[ "Österreich", "België", "Danmark", "France", "Deutschland", "Éire", "Italia",  "Nederland", "Norge", "Portugal", "España", "Sverige", "Schweiz","United Kingdom"],
     trim : true ,
     unique : false,
   },
@@ -118,7 +119,7 @@ const TransporteurModel = mongoose.Schema({
     type : String,
     
     required : true,
-    enum:["Algeria", "Tunisia", "Morocco","Libya"],
+    enum:["Algeria", "Tunisie", "Morocco","Libya"],
     trim : true ,
     unique : false,
   },
@@ -151,7 +152,8 @@ const TransporteurModel = mongoose.Schema({
   Parsols_Site:{
     required : false,
     type: [String],
-    enum:["Amazon", "Ebay","Ali Express","Shein","temu" ,"Autres"],
+
+    enum:["Amazon", "Ebay","Ali Express","Shein","Temu" ,"Autres"],
   },
   Adresse_Parsols: {
     type: {

@@ -63,9 +63,10 @@ app.use(errorMiddleware);
 connectDB();
 // port number
 const PORT = 3000;
+const ipAddress = '192.168.100.20';
 // serveur connecting 
-const serveur = app.listen(PORT, () => {
-  console.log(`serveur is running on port ${PORT}`.yellow.bold);
+const serveur = app.listen(PORT,ipAddress, () => {
+  console.log(`serveur is running on port ${ipAddress} ${PORT}`.yellow.bold);
 });
 
 process.on('unhandledRejection',(err,promise)=>{

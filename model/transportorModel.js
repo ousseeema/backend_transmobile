@@ -79,18 +79,13 @@ const TransporteurModel = mongoose.Schema({
   },
 
   DestinationAddress: {
-    type: {
-      type: String,
-     // required: [true, 'please enter location ']
-    },
+   type: String,
+   required : true ,
    
   },
   localAddress: {
-    type: {
-      type: String,
-      
-   //  required: [true, 'please enter location ']
-    },
+    type: String,
+    required : true ,
     
   },
 
@@ -141,6 +136,7 @@ const TransporteurModel = mongoose.Schema({
    type : Number,
    required : true , 
    default: 0, 
+   double: true
 
   },
   Parsols:{
@@ -156,32 +152,33 @@ const TransporteurModel = mongoose.Schema({
     enum:["Amazon", "Ebay","Ali Express","Shein","Temu" ,"Autres"],
   },
   Adresse_Parsols: {
-    type: {
+    
       type: String,
      required: false
-    },
+    
      },
   profilePicture : {
   type : String,
-  required : true,
+  required : false,
 },
   numberofTrips : {
     type : Number,
     default : 0,
     required : false,
-   
+    double: true
 },
 
   numberofClients : {
     type : Number,
     default : 0,
     required : false,
-   
+    double: true
   },
   numberofPackages : {
     type : Number,
     default : 0,
     required : false,
+    double: true
  
   },
   
@@ -195,6 +192,7 @@ const TransporteurModel = mongoose.Schema({
     type : Number,
     default : 0,
     required : false,
+    double: true
    
   },
   verified :{

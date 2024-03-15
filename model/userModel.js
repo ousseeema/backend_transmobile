@@ -2,13 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const userModel = mongoose.Schema({
 
-
-
-
-
-
-
-  fullname : 
+  fullName : 
   {
   type : String,
    required : [true, "Please enter your full name"] ,
@@ -82,13 +76,13 @@ const userModel = mongoose.Schema({
   country : {
     type : String,
     default : "",
-    required : false,
+    required : true,
     trim : true ,
     unique : false,
   },
   profilePicture :{
     type: String, 
-    default : "default.jpg"
+    default : "default.png"
   },
 
   resetToken : {

@@ -3,6 +3,7 @@ const router = express.Router();
 const {protect} = require('../../middleware/authmid')
 const usermodel= require("../../model/userModel")
 const {
+  currentTrips,
   addReview, getalldemande,  sendRequest,updateUserDetails,getVerified,uploadProfilePicture, getallTransportors,searchForTrip}= require("../../controller/userControler")
 //working
 router.route("/getAllTransporteur").get(protect(usermodel), getallTransportors);
@@ -20,6 +21,8 @@ router.route("/getverified").post(protect(usermodel), getVerified);
 router.route("/getalldemande/:id").get(protect(usermodel),getalldemande )
 //WORKING
 router.route("/addreview/:id").put(protect(usermodel), addReview);
+// missing testing 
+router.route("/currentTrips").get(protect(usermodel), currentTrips);
 
 
 module.exports = router;

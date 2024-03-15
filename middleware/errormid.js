@@ -1,4 +1,5 @@
 const errorhandler = (err,req, res, next) => {
+  console.log(err);
   if (err.name === "CastError") {
     res.status(400).send({ message: ` resource not found ` });
   }
@@ -21,25 +22,24 @@ const errorhandler = (err,req, res, next) => {
   else if(err.name==="TokenExpiredError"){
     res.status(400).send({
       success : false,
-      message: "token expired"
+      message: "token expired, please re login "
     })
   }
   else if(err.name==="TypeError"){
     res.status(400).send({
       success : false,
-      message: "input error"
+      message: err.message
     })
   }
   else if(err.name==="Error"){
     res.status(400).send({
       success : false,
-      message: "error"
-    })
+      message: err.message    })
   }
   else{
     res.status(400).send({
       success : false ,
-      message: "error"
+      message: err.message
     })
   }
   

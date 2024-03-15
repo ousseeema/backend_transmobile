@@ -196,9 +196,7 @@ let result = JSON.parse(req.body.data);
    }
    file.name = `package_${req.user.id}${path.parse(file.name).ext}`;
    
-   file.mv(
-       `./Images/packages/demandeimage/${file.name}`
-   );
+   
 
 
    result.message.packagephoto = file.name;
@@ -219,7 +217,9 @@ let result = JSON.parse(req.body.data);
       }
     );
    }
-
+   file.mv(
+    `./Images/packages/demandeimage/${file.name}`
+);
 
    res.status(201).send({
     status : "success", 
@@ -453,6 +453,55 @@ exports.getalldemande = asyncHandler(async(req, res, next )=>{
 
 
 
-})
+});
+
+
+//getting current trips for the user 
+
+
+exports.getCurrentTrips = asyncHandler(async(req, res, next)=>{
+
+
+  //! getting current trips that user has been accepted for them 
+
+
+  const currentTrips = await tripModel.find({
+    packages :{
+      $elemMatch:{
+        Client : req.user.id
+        
+      }
+    }
+  });
+
+
+  if(!currentTrips){
+  
+     return res.status(404).send({
+           success : false ,
+           message: "Ops ! No current Trips for you for the moment  ",
+           status : "fail", 
+           data: [],
+
+     });
+  }
+
+
+  //! sending the data to the user ui 
+  return res.status(200).send({
+    count : currentTrips.length,
+    success: true , 
+    message : "Done getting ", 
+    status: "fail",
+    data : currentTrips
+
+     
+  })
+
+
+  
+
+
+});
 
 

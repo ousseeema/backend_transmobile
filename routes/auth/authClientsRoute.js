@@ -14,8 +14,8 @@ router.route("/signup2").post(sign_up_2(ClientModel));
 //working
 router.route("/forgotpassword").post(forgotpassword(ClientModel));
 //working
-router.route("/resetpassword").post(resetpassword(ClientModel));
+router.route("/resetpassword").put(resetpassword(ClientModel));
 //working
-router.route("/resendverificationcode").post(resendVerificationCode(ClientModel));
+router.route("/resendverificationcode").put(resendVerificationCode(ClientModel));
 
 module.exports = router;

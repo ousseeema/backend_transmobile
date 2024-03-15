@@ -19,7 +19,7 @@ exports.sign_up_1 = (model) =>
     let request = JSON.parse(req.body.data);
 
     //! testing if there is any user in the client side or the trans side have the same email that the new user entered
-    if (model === clientmodel) {
+    if (model == clientmodel) {
       const testemail = await transportermodel.findOne({
         email: request.email,
       });
@@ -29,7 +29,7 @@ exports.sign_up_1 = (model) =>
           success: false,
         });
       }
-    } else if (model === transportermodel) {
+    } else if (model == transportermodel) {
       const testemail = await clientmodel.findOne({ email: request.email });
       if (testemail) {
         return res.status(404).send({
@@ -40,7 +40,13 @@ exports.sign_up_1 = (model) =>
     }
 
     const file = req.files.file;
-
+      if(file.mimetype.startsWith("image/png")||file.mimetype.startsWith("image/jpeg")||file.mimetype.startsWith("image/jpg")){
+        return res.status(400).send({
+          success: false,
+          message: "Please upload a photo type png , jpeg , gif ,",
+          data: [],
+        });
+      }
     if (!file) {
       return res.status(400).send({
         success: false,
@@ -56,6 +62,7 @@ exports.sign_up_1 = (model) =>
         data: [],
       });
     }
+    
     let who;
     if (model === clientmodel) {
       who = "users";
@@ -63,9 +70,7 @@ exports.sign_up_1 = (model) =>
       who = "transporteurs";
     }
 
-    file.name = `${who}_${request.fullName}${path.parse(file.name).ext}`;
-    request.profilePicture = file.name;
-    file.mv(`./Images/private/${who}/${file.name}`);
+
 
     const user = await model.create(request);
 
@@ -77,7 +82,11 @@ exports.sign_up_1 = (model) =>
         token: null,
       });
     }
-
+    // ! after creating the user we move the file to the directory in the serveur
+    file.name = `${who}_${user._id}${path.parse(file.name).ext}`;
+    user.profilePicture = file.name;
+    file.mv(`./Images/private/${who}/${file.name}`);
+   
     // sending a verification email to the user
 
     //creating a random number from 15 octets then converting it to hexadecimal and hashing it to sha256 then converting it to hexadecimal
@@ -89,7 +98,7 @@ exports.sign_up_1 = (model) =>
     const options = {
       emailto: user.email,
       subject: "Account Verification",
-      text: `dear ${req.body.fullname} enter this code to verifie your email ${verification_code}`,
+      text: `dear ${request.fullName} enter this code to verifie your email ${verification_code}`,
     };
 
     // sending the email
@@ -161,7 +170,6 @@ exports.sign_up_2 = (model) =>
       },
       { new: true }
     );
-
     return res.status(200).send({
       status: "success",
       success: true,
@@ -239,7 +247,7 @@ exports.forgotpassword = (model) =>
       return res.status(400).send({
         status: "fail",
         success: false,
-        message: "invalid creadentials",
+        message: "invalid email",
         data: [],
         token: null,
       });
@@ -254,6 +262,7 @@ exports.forgotpassword = (model) =>
       text: `Your password reset token is ${resetToken}`,
     };
 
+
     try {
       await sendemail(message);
       user.resetToken = resetToken;
@@ -265,7 +274,7 @@ exports.forgotpassword = (model) =>
       return res.status(200).send({
         status: "success",
         success: true,
-        message: "reset token sent to your email",
+        message: "reset code sent to your email",
         data: [],
         token: null,
       });
@@ -286,15 +295,15 @@ exports.forgotpassword = (model) =>
 // api end point for resetpassword with the new password
 exports.resetpassword = (model) =>
   asynchandler(async (req, res, next) => {
-    const { newpassword, resettoken } = req.body;
+    const { password, resetToken } = req.body;
     const user = await model
-      .findOne({ resetToken: resettoken })
+      .findOne({ resetToken: resetToken })
       .select("+password");
     if (!user) {
       return res.status(404).send({
         status: "fail",
         success: false,
-        message: "invalid token",
+        message: "invalid reset code",
         data: [],
         token: null,
       });
@@ -304,19 +313,19 @@ exports.resetpassword = (model) =>
       return res.status(404).send({
         status: "fail",
         success: false,
-        message: "token expired",
+        message: "reset code expired, Try re-send it ",
         data: [],
         token: null,
       });
     }
 
     try {
-      user.password = newpassword;
+      user.password = password;
       user.resetToken = undefined;
       user.resetTokenExpire = undefined;
-      const logedToken = await jwt.sign({ id: user._id, secret });
-      await user.save({
-        validateBeforeSave: true,
+      const token = jwt.sign({ id: user._id }, secret);
+      user.save({
+        validateBeforeSave: false,
       });
 
       return res.status(200).send({
@@ -324,16 +333,17 @@ exports.resetpassword = (model) =>
         success: true,
         message: "password reset successfully",
         data: user,
-        token: logedToken,
+        token: token,
       });
     } catch (err) {
+      console.log(err);
       user.resetToken = undefined;
       user.resetTokenExpire = undefined;
-      await user.save({ validateBeforeSave: false });
+      user.save({ validateBeforeSave: false });
       return res.status(500).send({
         status: "fail",
         success: false,
-        message: "unable to reset password",
+        message: "serveur error occurred",
         data: [],
         token: null,
       });

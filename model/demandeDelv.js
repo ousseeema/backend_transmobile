@@ -62,6 +62,7 @@ const  demande = mongoose.Schema({
   Client :{
     type : mongoose.Schema.ObjectId,
     ref:"user",
+    required : true,
     
 
   }, 
@@ -69,7 +70,7 @@ const  demande = mongoose.Schema({
 
     type : mongoose.Schema.ObjectId,
     ref: 'transporteur',
-
+    required : true ,
     
 
   }, 

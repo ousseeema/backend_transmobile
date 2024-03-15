@@ -262,16 +262,22 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
    }
 
 // adding the package to the trip
- const addPackageTo_theTrip = await tripModel.findByIdAndUpdate(req.params.id,{
+ const addPackageTo_theTrip = await tripModel.findByIdAndUpdate(
+  req.user.id,{
   $push : {packages : demandeaccepte},
   $inc : {numberofpackage :1}
- });
+ },{
+  isDone : false,
+ }
+ 
+ 
+ );
 
 
 
  if(!addPackageTo_theTrip){
   return res.status(400).send({
-    message : "error seatching for trip",
+    message : "error searching for trip",
     status :"fail",
     success : false,
    data :[]

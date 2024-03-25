@@ -35,6 +35,7 @@ const tripModel = mongoose.Schema({
   Home_delivery :{
     type : Boolean,
     default : false,
+    
 
 
   },

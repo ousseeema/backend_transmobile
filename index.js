@@ -49,7 +49,8 @@ app.use("/api/v0/authClient", authClientRoutes);
 const authTransporteurRoutes = require("./routes/auth/authTransporteurRoutes");
 app.use("/api/v0/authTransporteur", authTransporteurRoutes);
 
-
+// accessing photo from out side the application
+app.use("/Images/private/transporteur/", express.static("/Images/private/transporteur/"))
 
 
 

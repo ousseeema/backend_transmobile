@@ -153,6 +153,7 @@ exports.getallTransportors = asyncHandler(async(req, res, next) => {
 
 
    return res.status(200).send({
+    count : transportors.length,
      success : true ,
      message : "Transportors found",
      data : transportors
@@ -471,7 +472,8 @@ exports.getCurrentTrips = asyncHandler(async(req, res, next)=>{
         Client : req.user.id
         
       }
-    }
+    },
+    isDone : false
   });
 
 
@@ -492,7 +494,7 @@ exports.getCurrentTrips = asyncHandler(async(req, res, next)=>{
     count : currentTrips.length,
     success: true , 
     message : "Done getting ", 
-    status: "fail",
+    status: "success",
     data : currentTrips
 
      

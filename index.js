@@ -50,7 +50,8 @@ const authTransporteurRoutes = require("./routes/auth/authTransporteurRoutes");
 app.use("/api/v0/authTransporteur", authTransporteurRoutes);
 
 // accessing photo from out side the application
-app.use("/Images/private/transporteur/", express.static("/Images/private/transporteur/"))
+app.use("/Images/", express.static(path.join(__dirname,"Images"))) 
+
 
 
 
@@ -64,11 +65,17 @@ app.use(errorMiddleware);
 connectDB();
 // port number
 const PORT = 3000;
+
+
 const ipAddress = '192.168.100.20';
 // serveur connecting 
 const serveur = app.listen(PORT,ipAddress, () => {
   console.log(`serveur is running on port ${ipAddress} ${PORT}`.yellow.bold);
 });
+
+
+
+
 
 process.on('unhandledRejection',(err,promise)=>{
   console.log(`error : ${err.message}`.red);

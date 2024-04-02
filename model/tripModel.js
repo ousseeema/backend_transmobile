@@ -7,19 +7,26 @@ const City = mongoose.Schema({
     required: true,
     trim: true,
   },
-  dateofpassage: String,
+  dateofpassage: Date,
   Done:{
     type : Boolean,
     default : false,
+    required : true
   }
 });
 
+
+
 const tripModel = mongoose.Schema({
+
+
 
   transporter :{
     type:mongoose.Schema.Types.ObjectId,
-   ref :"transpoteur"
+   
+  ref:"transporteur"
   },
+  
   
   Citys :{
     type : [City],

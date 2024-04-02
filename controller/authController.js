@@ -40,13 +40,6 @@ exports.sign_up_1 = (model) =>
     }
 
     const file = req.files.file;
-      if(file.mimetype.startsWith("image/png")||file.mimetype.startsWith("image/jpeg")||file.mimetype.startsWith("image/jpg")){
-        return res.status(400).send({
-          success: false,
-          message: "Please upload a photo type png , jpeg , gif ,",
-          data: [],
-        });
-      }
     if (!file) {
       return res.status(400).send({
         success: false,

@@ -9,7 +9,7 @@ const errorhandler = (err,req, res, next) => {
   else if (err.name === "ValidationError") {
     
     
-      res.status(400).send({success: false, message:"check your input fields , there is missing field"})
+      res.status(400).send({success: false, message:err.message});
   }
   else if(err.name==="SyntaxError"){
     res.status(400).send({

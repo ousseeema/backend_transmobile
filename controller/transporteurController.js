@@ -165,7 +165,16 @@ exports.addTrip = asyncHandler(async(req, res, next) => {
      }
    
      req.body.transporter = req.user.id;
-     // crating a new trip with the details 
+     // crating a new trip with the details
+      if(!req.body.transporter || !req.body.Citys){
+        return res.status(400).send({
+          success : false,  
+          message : "error while adding the the trip due to missings fileds",
+          data:[],
+          
+
+        });
+      }
     const trip= await tripModel(req.body);
     trip.save({
       runvalidate : true,
@@ -179,6 +188,7 @@ exports.addTrip = asyncHandler(async(req, res, next) => {
       message : 'You cannot add trip twice',
     })
 
+    
   }
   
    

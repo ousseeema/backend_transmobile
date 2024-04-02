@@ -257,5 +257,6 @@ TransporteurModel.methods.matchPassword = function(password){
   return bcrypt.compare(password, this.password);
 
 }
+transporteur = mongoose.model("transporteur", TransporteurModel)
 
-module.exports = mongoose.model("transporteur", TransporteurModel);
+module.exports = transporteur;

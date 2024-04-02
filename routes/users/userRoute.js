@@ -15,7 +15,8 @@ router.route("/uploadProfilePicture").put(protect(usermodel), uploadProfilePictu
 router.route("/searchtrip").get(protect(usermodel), searchForTrip);
 //working
 router.route("/sendrequest").post(protect(usermodel), sendRequest);
-//working 
+//working
+ 
 router.route("/getverified").post(protect(usermodel), getVerified);
 //working
 router.route("/getalldemande/:id").get(protect(usermodel),getalldemande )

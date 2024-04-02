@@ -7,6 +7,9 @@ const path = require('path');
 const tripModel = require('../model/tripModel') ;
 const transporteur = require("../model/transportorModel");
 const { json } = require('express');
+const CircularJSON = require('circular-json');
+const transportorModel = require('../model/transportorModel');
+
 // updating user data name email
 
 exports.updateUserDetails= asyncHandler(async(req, res , next) => {
@@ -344,11 +347,14 @@ exports.searchForTrip = asyncHandler(async(req,  res, next)=>{
         query = query.sort("createdAt");
     }
 
+
+   const  result = await query.populate(
+   'transporter');
     return res.status(200).send({
       message : "we found some results",
       status : "success",
       success : true,
-      data :query,
+      data :result,
     });
 
   
@@ -358,7 +364,7 @@ exports.searchForTrip = asyncHandler(async(req,  res, next)=>{
 } catch (err) {
     
     return res.status(500).send({ 
-      success: false, message: "Server Error",
+      success: false, message: err.message,
     data:[] });
 }
 });

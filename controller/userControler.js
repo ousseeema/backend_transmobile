@@ -136,14 +136,46 @@ const file = req.files.file;
 
 
 });
+// getall trips from data base 
+exports.getallTrips = asyncHandler(async(req, res, next) => {
+    
 
+  const allTrips = await tripModel.find().populate({
+    path: 'transporter',
+    populate: {
+      path: 'comments.user'
+    }
+  }).sort("createdAt");
+
+  if(!allTrips){
+    return res.status(404).send({
+      message : "No results found",
+      success : false,
+      data:[],
+    })
+  }
+
+
+  return res.status(200).send({
+    success : true,
+    message : "Done getting trips successfully",
+    data: allTrips,
+  })
+  
+
+
+
+
+});
 
 // get all transporteurs from the database 
 
 exports.getallTransportors = asyncHandler(async(req, res, next) => {
 
 
-  const transportors = await transporteur.find();
+  const transportors = await transporteur.find().populate({
+    path: 'comments.user'
+  });
 
 
    if(!transportors){
@@ -170,7 +202,7 @@ exports.getallTransportors = asyncHandler(async(req, res, next) => {
 
 // send a request to the transporter to accepot the package
 exports.sendRequest = asyncHandler(async(req, res, next)=>{
-//! convert the request to an object 
+ 
 if(!req.body.data){
   return res.status(404).send({
     message : "please enter the info request",
@@ -178,6 +210,7 @@ if(!req.body.data){
     data:[]
   })
 }
+//! convert the request to an object
 let result = JSON.parse(req.body.data);
 
    const file = req.files.file ;
@@ -202,7 +235,7 @@ let result = JSON.parse(req.body.data);
    
    
 
-
+    result.Client = req.user.id;
    result.message.packagephoto = file.name;
  
 
@@ -328,18 +361,22 @@ exports.searchForTrip = asyncHandler(async(req,  res, next)=>{
     let queryStr = JSON.stringify(reqQuery);
 
     // Create operators ($gt, $gte, etc)
-    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
-
+    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in|eq)\b/g, match => `$${match}`);
+   
     // Finding resource
     query = tripModel.find(JSON.parse(queryStr));   
 
     // Select fields
+
     if (req.query.select) {
         const fields = req.query.select.split(",").join(" ");
         query = query.select(fields);
+
+
     }
 
     // Sort
+
     if (req.query.sort) {
         const sortBy = req.query.sort.split(",").join(" ");
         query = query.sort(sortBy);
@@ -349,7 +386,12 @@ exports.searchForTrip = asyncHandler(async(req,  res, next)=>{
 
 
    const  result = await query.populate(
-   'transporter');
+    {
+      path: 'transporter',
+      populate: {
+        path: 'comments.user'
+      }
+    });
     return res.status(200).send({
       message : "we found some results",
       status : "success",
@@ -374,8 +416,8 @@ exports.searchForTrip = asyncHandler(async(req,  res, next)=>{
 
 // ajouter un  review pour un transporteur
 exports.addReview =asyncHandler(async(req, res, next)=>{
-  const {fullname, message, rating , } = req.body
-   if(!fullname || !message || !rating){
+  const { message, rating ,user } = req.body
+   if( !message || !rating) {
     return res.status(404).send({
       message :" please enter your full review ",
       success : false,
@@ -383,13 +425,19 @@ exports.addReview =asyncHandler(async(req, res, next)=>{
       data :[]
     });
    }
-   const comment = await transporteur.findByIdAndUpdate(
+   const comment1 = await transporteur.findByIdAndUpdate(
     {
       _id: req.params.id,
     },
     {
-      $push : {comments : req.body},
+      $push : {comments : {
+        
+        user: req.user.id,
+        comment: message,
+        rating: rating
+      }},
     },
+    
     {
       runvalidater:true,
       new: true 
@@ -398,7 +446,7 @@ exports.addReview =asyncHandler(async(req, res, next)=>{
    );
    
 
-   if(!comment){
+   if(!comment1){
     return res.status(404).send({
       success: true , 
       status: "fail", 
@@ -414,10 +462,10 @@ exports.addReview =asyncHandler(async(req, res, next)=>{
     success: true,
     status : "success",
     data:  {
-      "fullname": fullname,
+      "user": req.user.id,
       "message":message,
       "rating":rating,
-      "createdAt": comment.createdAt
+      "createdAt": comment1.createdAt
     }
    })
 
@@ -426,6 +474,7 @@ exports.addReview =asyncHandler(async(req, res, next)=>{
 
 
 });
+
 
 
 

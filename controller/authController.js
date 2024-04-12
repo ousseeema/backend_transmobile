@@ -15,6 +15,7 @@ exports.sign_up_1 = (model) =>
         success: false,
         data: [],
       });
+      
     }
     let request = JSON.parse(req.body.data);
 

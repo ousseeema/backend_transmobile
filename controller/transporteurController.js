@@ -209,7 +209,7 @@ exports.getAlldemande = asyncHandler(async(req, res, next) => {
  const alldemandes = await demandeDelv.find(
   {transporter : req.user.id}
 
-  );
+  ).populate('Client');
    if(!alldemandes){
 
     return res.status(403).send({

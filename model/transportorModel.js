@@ -3,11 +3,10 @@ const bcrypt = require('bcryptjs');
 const geocoder= require('../utils/geocoder');
 
 const comment = mongoose.Schema({
-  fullname :{
-    type : String , 
-    required : [true, "please enter your name first"],
-    trim : true , 
-
+ 
+  user: {
+ type: mongoose.Schema.Types.ObjectId,
+ ref: "user"
   },
   comment :{
     type : String ,
@@ -203,7 +202,7 @@ const TransporteurModel = mongoose.Schema({
     type: Boolean,
     default : true ,
   },
-  
+    
   
 
   resetToken : {

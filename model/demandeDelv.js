@@ -1,12 +1,7 @@
 const mongoose = require("mongoose");
 const requestbody = mongoose.Schema({
  
-  fullname : {
-    type : String, 
-    required : true, 
-    trim: true,
-    
-  },
+ 
   numberofkg :{
     type : Number, 
     required : true, 
@@ -25,7 +20,7 @@ const requestbody = mongoose.Schema({
 
   },
 
-  fulladdress :{
+  Pickupaddress :{
     type : String, 
     required : true ,
     trim: true,
@@ -43,10 +38,7 @@ const requestbody = mongoose.Schema({
     type : Boolean,
     default : false,
   },
-  homedeliveryAddress :{
-    type : String,
-    required : false,
-  },
+
 
   packagephoto :{
     type : String,

@@ -10,8 +10,7 @@ const {
 router.route("/getAllTransporteur").get(protect(usermodel), getallTransportors);
 //working
 router.route("/updateUserDetails").put(protect(usermodel), updateUserDetails);
-//working
-router.route("/uploadProfilePicture").put(protect(usermodel), uploadProfilePicture);
+
 //working 
 router.route("/searchtrip").get(protect(usermodel), searchForTrip);
 //working
@@ -27,6 +26,7 @@ router.route("/addreview/:id").put(protect(usermodel), addReview);
 router.route("/currentTrips").get(protect(usermodel), getCurrentTrips);
 // working 
 router.route("/getalltrips").get(protect(usermodel),getallTrips)
+
 
 
 

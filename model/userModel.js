@@ -10,6 +10,10 @@ const userModel = mongoose.Schema({
    unique : false,
 
   }, 
+  verified:{
+    type : Boolean,
+    default : false
+  },
  
   email :{
     type : String,

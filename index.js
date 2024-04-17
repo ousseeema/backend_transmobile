@@ -77,6 +77,11 @@ const serveur = app.listen(PORT,ipAddress, () => {
 
 
 
+
+
+
+
+
 process.on('unhandledRejection',(err,promise)=>{
   console.log(`error : ${err.message}`.red);
   serveur.close(()=>process.exit(1))

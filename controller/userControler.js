@@ -15,7 +15,9 @@ const transportorModel = require("../model/transportorModel");
 exports.updateUserDetails = asyncHandler(async (req, res, next) => {
   let request = JSON.parse(req.body.data);
   // *! if the user has sent a pic to update
-  if (request.files.file) {
+  
+  if (req.files && req.files.file) {
+    const file =req.files.file;
     //  check the   image size
     if (file.size > 1000000) {
       return res.status(400).send({

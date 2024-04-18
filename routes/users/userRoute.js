@@ -5,7 +5,7 @@ const usermodel= require("../../model/userModel")
 const {
   getCurrentTrips,
   getallTrips,
-  addReview, getalldemande,  sendRequest,updateUserDetails,getVerified,uploadProfilePicture, getallTransportors,searchForTrip}= require("../../controller/userControler")
+  addReview, getalldemande,  sendRequest,updateUserDetails,getVerified, getallTransportors,searchForTrip}= require("../../controller/userControler")
 //working
 router.route("/getAllTransporteur").get(protect(usermodel), getallTransportors);
 //working

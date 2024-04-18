@@ -15,9 +15,9 @@ const transportorModel = require("../model/transportorModel");
 exports.updateUserDetails = asyncHandler(async (req, res, next) => {
   let request = JSON.parse(req.body.data);
   // *! if the user has sent a pic to update
-  
+
   if (req.files && req.files.file) {
-    const file =req.files.file;
+    const file = req.files.file;
     //  check the   image size
     if (file.size > 1000000) {
       return res.status(400).send({
@@ -63,11 +63,6 @@ exports.updateUserDetails = asyncHandler(async (req, res, next) => {
     }
   }
 
-
-
-
-
-
   if (request.password) {
     return res.status(400).send({
       success: false,
@@ -94,7 +89,6 @@ exports.updateUserDetails = asyncHandler(async (req, res, next) => {
     data: finaluser,
   });
 });
-
 
 // getall trips from data base
 exports.getallTrips = asyncHandler(async (req, res, next) => {
@@ -433,4 +427,106 @@ exports.getCurrentTrips = asyncHandler(async (req, res, next) => {
     status: "success",
     data: currentTrips,
   });
+});
+
+
+
+exports.checkemailBeforechange=  asyncHandler(async(req, res, next)=>{
+
+   const email = req.body.email;
+
+   if(!email){
+    return res.status(404).send({
+      success: false ,
+      message: "you must provide us with an email", 
+      data: [],
+    });
+   }
+
+   //! searching for a user that  have the same email
+   const user = await userModel.findOne({email: email});
+  //! if there are a user with the same email then return error
+   if(user){
+     
+    return res.status(200).send({
+      success: false, 
+      message: "user with the same email exists already",
+      data:[]
+    })
+   }
+   //! if there are no users with the same email update the user email
+
+   const userupdated = await userModel.findByIdAndUpdate(req.user.id, {email: email});
+
+   if(!userupdated){
+    return res.status(404).send({
+      success: false, 
+      message: "user exists with the same email",
+      data:[]
+
+    });
+   }
+   return res.status(200).send({
+    success: true,
+    message: "user updated successfully",
+    data:userupdated
+   });
+     
+});
+
+exports.changepasword= asyncHandler(async(req, res, next)=>{
+   
+  const {oldpassword, newpassword} = req.body;
+
+   if(!oldpassword || !newpassword){
+    return res.status(404).send({
+      success: false,
+      message:"try sending valid  data",
+      data:[]
+    });
+   }
+
+
+   const user = await userModel.findById(req.user.id).select("+password");
+
+   if(!user){
+    return res.statud(404).send( {
+      success: false ,
+      message: "user not found", 
+      data:[]
+    });
+   }
+
+   const isMatched = user.matchPassword(oldpassword);
+
+   if(!isMatched){
+    return res.status(404).send({
+      success : false,
+      message: "password isn t correct "
+    });
+   }
+   
+    try {
+      user.password = newpassword;
+    user.save();
+    return res.status(200).send({
+      success : true,
+      message: "user updated successfully",
+      
+    });
+    
+    } catch (e) {
+      return res.status(200).send({
+        success : true,
+        message: "ops faild to update password",
+        
+      });
+
+    }
+
+
+
+
+   
+   
 });

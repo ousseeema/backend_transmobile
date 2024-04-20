@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {protect} = require('../../middleware/authmid')
 const usermodel= require("../../model/userModel")
-const {
+const {getallverificationdemandes,
   checkemailBeforechange,
   changepasword,
   getCurrentTrips,
@@ -28,10 +28,12 @@ router.route("/currentTrips").get(protect(usermodel), getCurrentTrips);
 // working 
 router.route("/getalltrips").get(protect(usermodel),getallTrips);
 // working
+
 router.route("/changeuseremail").put(protect(usermodel), checkemailBeforechange);
 // working
 router.route("/changepassword").put(protect(usermodel), changepasword);
-
+// working
+router.route("/GetverificationDemandesList").get(protect(usermodel), getallverificationdemandes);
 
 
 module.exports = router;

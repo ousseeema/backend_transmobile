@@ -4,10 +4,11 @@ const mongoose = require("mongoose");
 
 const verified = mongoose.Schema({
  
-  demander_id :{
-    type: mongoose.Schema.ObjectId,
-  required: true
-},
+  userId :{
+    type: mongoose.Schema.Types.ObjectId , 
+    required : true, 
+  
+  },
   fullname :{
     type: String , 
     required : true, 

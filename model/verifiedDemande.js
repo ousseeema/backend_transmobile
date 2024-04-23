@@ -9,11 +9,8 @@ const verified = mongoose.Schema({
     required : true, 
   
   },
-  fullname :{
-    type: String , 
-    required : true, 
-    trim : true,
-  },
+  
+  
   passport_image : {
     type : String ,
     required : true,

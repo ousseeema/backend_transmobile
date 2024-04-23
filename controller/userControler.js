@@ -208,7 +208,7 @@ exports.getVerified = asyncHandler(async (req, res, next) => {
   //! convert the req to an object because it came in String format
   let result = JSON.parse(req.body.data);
   //! adding the client id to the object
-  result.demander_id = req.user.id;
+  result.userId = req.user.id;
 
   const file = req.files.file;
 
@@ -375,7 +375,7 @@ exports.addReview = asyncHandler(async (req, res, next) => {
 exports.getalldemande = asyncHandler(async (req, res, next) => {
   // getting the demande
   const demandes = await demande.find({
-    Client: req.params.id,
+    Client: req.user.id,
   });
 
   if (!demandes) {

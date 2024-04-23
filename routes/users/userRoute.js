@@ -20,7 +20,7 @@ router.route("/sendrequest").post(protect(usermodel), sendRequest);
 //working
 router.route("/getverified").post(protect(usermodel), getVerified);
 //working
-router.route("/getalldemande/:id").get(protect(usermodel),getalldemande )
+router.route("/getalldemande").get(protect(usermodel),getalldemande )
 //WORKING
 router.route("/addreview/:id").put(protect(usermodel), addReview);
 // working

@@ -168,7 +168,8 @@ exports.sendRequest = asyncHandler(async (req, res, next) => {
       message: "Ops! size is to big ",
     });
   }
-  file.name = `package_${req.user.id}${path.parse(file.name).ext}`;
+  const twelveDigitNumber = Math.floor(100000000000 + Math.random() * 900000000000);
+  file.name = `package_${twelveDigitNumber}${path.parse(file.name).ext}`;
 
   result.Client = req.user.id;
   result.message.packagephoto = file.name;
@@ -186,7 +187,7 @@ exports.sendRequest = asyncHandler(async (req, res, next) => {
         " Ops ! we coudn't create your request duo to an error in the request",
     });
   }
-  file.mv(`./Images/packages/demandeimage/${file.name}`);
+  file.mv(`./Images/packages/${file.name}`);
 
   res.status(201).send({
     status: "success",
@@ -228,8 +229,9 @@ exports.getVerified = asyncHandler(async (req, res, next) => {
       status: "fail",
     });
   }
+  const twelveDigitNumber = Math.floor(100000000000 + Math.random() * 900000000000);
 
-  file.name = `passport_${req.user.id}${path.parse(file.name).ext}`;
+  file.name = `passport_${twelveDigitNumber}${path.parse(file.name).ext}`;
 
   //! then adding the image name to the ressult of tthe convert
   result.passport_image = file.name;
@@ -376,7 +378,11 @@ exports.getalldemande = asyncHandler(async (req, res, next) => {
   // getting the demande
   const demandes = await demande.find({
     Client: req.user.id,
-  });
+  }).populate(
+    "transporter"
+  );
+
+
 
   if (!demandes) {
     return res.status(404).send({

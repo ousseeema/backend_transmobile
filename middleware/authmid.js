@@ -46,7 +46,7 @@ exports.protect = (model)=> asynchandller(async(req, res, next)=>{
   } catch (err) {
     return res.status(500).send({
       success : false ,
-      message : "Error in the server",
+      message : err.message,
       data : [],
      })
    }

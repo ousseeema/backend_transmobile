@@ -2,13 +2,17 @@ const express = require('express');
 const router = express.Router();
 const {protect} = require('../../middleware/authmid')
 const usermodel= require("../../model/userModel")
-const {getallverificationdemandes,
+const {
+  Contactadmin,
+  getallverificationdemandes,
   checkemailBeforechange,
   changepasword,
   getCurrentTrips,
   getallTrips,
   addReview, getalldemande,  sendRequest,updateUserDetails,getVerified, getallTransportors,searchForTrip}= require("../../controller/userControler")
-//working
+// working 
+router.route("/sendReclamationRequest").post(protect(usermodel),Contactadmin );
+  //working
 router.route("/getAllTransporteur").get(protect(usermodel), getallTransportors);
 //working
 router.route("/updateUserDetails").put(protect(usermodel), updateUserDetails);

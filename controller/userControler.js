@@ -10,6 +10,7 @@ const { json } = require("express");
 const CircularJSON = require("circular-json");
 const transportorModel = require("../model/transportorModel");
 const verifiedDemande = require("../model/verifiedDemande");
+const ContactAdmin = require("../model/ContactAdmin");
 
 // updating user data name email
 
@@ -191,6 +192,7 @@ exports.sendRequest = asyncHandler(async (req, res, next) => {
 
   res.status(201).send({
     status: "success",
+    
     success: true,
     message: "Request have sent successfuly ",
     data: [],
@@ -544,4 +546,29 @@ exports.getallverificationdemandes = asyncHandler(async(req, res, next)=>{
     })
 
    
+});
+// send reclamation to the admins 
+exports.Contactadmin= asyncHandler(async(req, res, next)=>{
+   const reclamation = req.body.reclamation;
+   const userId = req.user.id;
+   const contact = await ContactAdmin.create(
+    {
+      Client: userId,
+      reclamation: reclamation
+    }
+   );
+   if(!contact){
+    return res.status(400).send({
+      message : "error creating reclaimed message",
+      success: false,
+      data:[]
+    });
+   }
+
+   return res.status(200).send({
+    message :"Done ! your reclamation has been sent to the admins",
+    success: true,
+    data:[]
+   })
+
 });

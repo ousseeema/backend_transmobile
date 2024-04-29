@@ -547,7 +547,7 @@ exports.getallverificationdemandes = asyncHandler(async(req, res, next)=>{
 
    
 });
-// send reclamation to the admins 
+// user send reclamation to the admins 
 exports.Contactadmin= asyncHandler(async(req, res, next)=>{
    const reclamation = req.body.reclamation;
    const userId = req.user.id;

@@ -623,6 +623,34 @@ const trip = await tripModel.findByIdAndUpdate(req.params.id,
 
 
 
+  });
+  
+
+
+// transporter  send reclamation to the admins 
+exports.Contactadmin= asyncHandler(async(req, res, next)=>{
+  const reclamation = req.body.reclamation;
+  const userId = req.user.id;
+  const contact = await ContactAdmin.create(
+   {
+     Client: userId,
+     reclamation: reclamation
+   }
+  );
+  if(!contact){
+   return res.status(400).send({
+     message : "error creating reclaimed message",
+     success: false,
+     data:[]
+   });
+  }
+
+  return res.status(200).send({
+   message :"Done ! your reclamation has been sent to the admins",
+   success: true,
+   data:[]
   })
+
+});
 
  

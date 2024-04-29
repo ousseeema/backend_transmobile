@@ -4,7 +4,8 @@ const {protect} = require('../../middleware/authmid')
 const transporteur= require("../../model/transportorModel")
 
 const { gethistorylist, addTrip,addTripToHistory, updateTrip,deleteTrip,addSinglePackage , updateUserDetails,uploadProfilePicture, acceptDemande, refusedemande,getAllPackage_forSingleTrip, getAlldemande }= require("../../controller/transporteurController")
-
+// working
+router.route("/transsendreclamation").put(protect(transporteur), updateUserDetails);
 //working
 router.route("/updateTransporteurDetails").put(protect(transporteur), updateUserDetails);
 //working

@@ -11,7 +11,7 @@ const CircularJSON = require("circular-json");
 const transportorModel = require("../model/transportorModel");
 const verifiedDemande = require("../model/verifiedDemande");
 const ContactAdmin = require("../model/ContactAdmin");
-
+const MessageModel = require('../model/messageModel');
 // updating user data name email
 
 exports.updateUserDetails = asyncHandler(async (req, res, next) => {
@@ -570,5 +570,52 @@ exports.Contactadmin= asyncHandler(async(req, res, next)=>{
     success: true,
     data:[]
    })
+
+});
+
+
+// getting all message for  the specific user 
+exports.getListofMessage = asyncHandler(async(req, res, next)=>{
+  const ListOfMessage = await MessageModel.find({
+    clientId: req.user.id
+  }) ;
+  if(!ListOfMessage){
+    return res.status(404).send({
+      message: "error getting message", 
+      success: false,
+      data:[]
+    });
+  }
+
+  return res.status(200).send({
+    message: "Done getting messages", 
+    success: true,
+    data:ListOfMessage
+  });
+});
+
+exports.createDiscussion = asyncHandler(async(req, res, next)=>{
+  const existedDiscussion = await MessageModel.find({
+    transporteur: req.body.transporterId,
+    Client: req.user.id
+  }); 
+
+  if(existedDiscussion==false){
+      const newDiscussion = await MessageModel.create({
+        clientId : req.user.id,
+        transporteur : req.body.transporterId, 
+        $push:{
+          messages: {
+            user: req.user.id,
+            message: message,
+            CreatedAt: Date.now(),
+          },
+        }
+        
+      })
+  }
+  else{
+
+  }
 
 });

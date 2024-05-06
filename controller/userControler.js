@@ -578,7 +578,7 @@ exports.Contactadmin= asyncHandler(async(req, res, next)=>{
 exports.getListofMessage = asyncHandler(async(req, res, next)=>{
   const ListOfMessage = await MessageModel.find({
     clientId: req.user.id
-  }) ;
+  }).populate("transporteur") ;
   if(!ListOfMessage){
     return res.status(404).send({
       message: "error getting message", 

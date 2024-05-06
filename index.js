@@ -17,9 +17,9 @@ const connectDB = require("./config/database");
 // everything passes through the middleware BECOME in json format 
 app.use(express.json());
 //  importing socket io 
-const http = require('http');
-const server = http.createServer(app);
-const io = require('socket.io')(server);
+
+
+
 
 const uploadfile = require("express-fileupload")
 app.use(uploadfile());
@@ -69,19 +69,19 @@ connectDB();
 // port number
 const PORT = 3000;
 
- 
-const ipAddress = '192.168.100.20';
+const ipAddress = '192.168.1.38';
 // serveur connecting 
-server.listen(PORT, ipAddress,() => {
+ const server =app.listen(PORT, ipAddress,() => {
   console.log(`Server running on port ${PORT}`);
 });
 
-
+const io = require('socket.io')(server);
 
 // connecting to the socket server
 
 io.on('Connection',(socket)=>{
   console.log('Connected'.magenta);
+  
   socket.on('/sendMessage',(message)=>{
    console.log(message);
 

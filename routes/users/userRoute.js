@@ -3,6 +3,7 @@ const router = express.Router();
 const {protect} = require('../../middleware/authmid')
 const usermodel= require("../../model/userModel")
 const {
+  getListofMessage,
   Contactadmin,
   getallverificationdemandes,
   checkemailBeforechange,
@@ -10,7 +11,10 @@ const {
   getCurrentTrips,
   getallTrips,
   addReview, getalldemande,  sendRequest,updateUserDetails,getVerified, getallTransportors,searchForTrip}= require("../../controller/userControler")
-// working 
+//working
+  router.route("/getListOfMessage").get(protect(usermodel),getListofMessage );
+
+  // working 
 router.route("/sendReclamationRequest").post(protect(usermodel),Contactadmin );
   //working
 router.route("/getAllTransporteur").get(protect(usermodel), getallTransportors);

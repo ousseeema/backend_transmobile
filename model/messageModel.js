@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 
-const mmessageModel = mongoose.Schema({
+const messageModel = mongoose.Schema({
 
    clientId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -20,3 +20,5 @@ const mmessageModel = mongoose.Schema({
 
 
 });
+
+module.exports = mongoose.model('Message',messageModel)

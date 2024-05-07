@@ -593,29 +593,3 @@ exports.getListofMessage = asyncHandler(async(req, res, next)=>{
     data:ListOfMessage
   });
 });
-
-exports.createDiscussion = asyncHandler(async(req, res, next)=>{
-  const existedDiscussion = await MessageModel.find({
-    transporteur: req.body.transporterId,
-    Client: req.user.id
-  }); 
-
-  if(existedDiscussion==false){
-      const newDiscussion = await MessageModel.create({
-        clientId : req.user.id,
-        transporteur : req.body.transporterId, 
-        $push:{
-          messages: {
-            user: req.user.id,
-            message: message,
-            CreatedAt: Date.now(),
-          },
-        }
-        
-      })
-  }
-  else{
-
-  }
-
-});

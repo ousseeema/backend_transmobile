@@ -69,7 +69,7 @@ connectDB();
 // port number
 const PORT = 3000;
 
-const ipAddress = '192.168.1.38';
+const ipAddress = '192.168.100.20';
 // serveur connecting 
  const server =app.listen(PORT, ipAddress,() => {
   console.log(`Server running on port ${PORT}`);
@@ -77,15 +77,85 @@ const ipAddress = '192.168.1.38';
 
 const io = require('socket.io')(server);
 
+
+const MessageModel=require('./model/messageModel');
+
+
 // connecting to the socket server
 
-io.on('Connection',(socket)=>{
-  console.log('Connected'.magenta);
-  
-  socket.on('/sendMessage',(message)=>{
+io.on('connection',(socket)=>{
+  console.log('Connected', socket.id.magenta);
+  socket.on('disconnect',()=>{
+    console.log('Disconnected',socket.id.bgMagenta);
+  });
+
+  socket.on('sendMessage',async (message)=>{
    console.log(message);
 
+
+
+
+   const existedDiscussion = await MessageModel.find({
+    transporteur: message["transporteur"],
+    clientId: message['user']
+  }); 
+
+  if(existedDiscussion==false){
+    // if user has not contacted the transporteur anytime
+    //!create new discussion and send the message to the transporteur 
+      const newDiscussion = await MessageModel.create({
+        clientId :  message['user'],
+        transporteur : message["transporteur"], 
+        $push:{
+          messages: {
+            user:  message['user'],
+            message: message,
+            CreatedAt: Date.now(),
+          },
+        }
+        
+      });
+
+      await newPost.populate('transporteur').execPopulate();
+      console.log(newDiscussion);
+      socket.broadcast.emit("message-recived",newDiscussion);
+
+
+
+
+
+
+  }
+  else{
+    const OldDiscussion = await MessageModel.findOneAndUpdate({
+      transporteur: message["transporteur"],
+      Client: message['user']
+    },  {
+      $push: {
+        messages: {
+          user:message['user'] ,
+          message: message,
+          CreatedAt: Date.now(),
+        },
+      },
+    },
+    { new: true }).populate('transporteur'); 
+    console.log(OldDiscussion);
+    socket.broadcast.emit("message-recived",OldDiscussion);
+
+
+
+    
+  }
+
+
+
+
+
+   
+
   });
+
 })
 
 

@@ -16,6 +16,10 @@ const messageModel = mongoose.Schema({
 
    messages: {
     type :  [Map], 
+   },
+   createdAt:{
+      type: Date,
+      default: Date.now()
    }
 
 

@@ -380,9 +380,13 @@ exports.getalldemande = asyncHandler(async (req, res, next) => {
   // getting the demande
   const demandes = await demande.find({
     Client: req.user.id,
-  }).populate(
-    "transporter"
-  );
+
+  }).populate({
+    path: "transporter",
+    populate: {
+      path: "comments.user" // Populate the 'user' field in the 'comments' array
+    }
+  });
 
 
 
@@ -593,3 +597,10 @@ exports.getListofMessage = asyncHandler(async(req, res, next)=>{
     data:ListOfMessage
   });
 });
+exports.getCurrentUser=asyncHandler(async(req, res, next)=>{
+  return res.status(200).send({
+    success: true,
+    message: "Current user",
+    data: req.user
+  })
+})

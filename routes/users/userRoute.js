@@ -3,6 +3,7 @@ const router = express.Router();
 const {protect} = require('../../middleware/authmid')
 const usermodel= require("../../model/userModel")
 const {
+  getCurrentUser,
   getListofMessage,
   Contactadmin,
   getallverificationdemandes,
@@ -43,5 +44,6 @@ router.route("/changepassword").put(protect(usermodel), changepasword);
 // working
 router.route("/GetverificationDemandesList").get(protect(usermodel), getallverificationdemandes);
 
-
+// working 
+router.route('/getcurrentuser').get(protect(usermodel), getCurrentUser);
 module.exports = router;

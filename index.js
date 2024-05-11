@@ -71,11 +71,12 @@ connectDB();
 // port number
 const PORT = 3000;
 
-const ipAddress = '192.168.1.36';
+const ipAddress = '192.168.100.20';
 // serveur connecting 
  const server =app.listen(PORT, ipAddress,() => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 const io = require('socket.io')(server);
 
@@ -95,15 +96,16 @@ io.on('connection',(socket)=>{
   });
 
   socket.on('sendMessage',async (message)=>{
-   console.log(message);
+  
 
 
 
+       
 
    const existedDiscussion = await MessageModel.findOne({
     transporteur: message.transporteur,
     clientId: message.user
-  });
+  }).populate('transporteur');
   
   if (!existedDiscussion) {
     // Create a new discussion and add the message
@@ -114,23 +116,30 @@ io.on('connection',(socket)=>{
         {
           user: message.user,
           message: message.message,
-          createdAt: Date.now()
+         
         }
       ]
       
     });
+    await newDiscussion.populate("transporteur");
   
     await newDiscussion.save();
+    
+    socket.emit("message-received", newDiscussion );
+   
     socket.to(message.transporteur).emit("message-received", newDiscussion);
   } else {
     // Update the existing discussion with the new message
     existedDiscussion.messages.push({
       user: message.user,
       message: message.message,
-      createdAt: Date.now()
+      
     });
-  
+      
     await existedDiscussion.save();
+     socket.emit("message-received", existedDiscussion);
+     
+
     socket.to(message.transporteur).emit("message-received", existedDiscussion);
   }
 
@@ -141,6 +150,7 @@ io.on('connection',(socket)=>{
    
 
   });
+
 
 })
 

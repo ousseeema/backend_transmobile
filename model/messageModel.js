@@ -15,11 +15,19 @@ const messageModel = mongoose.Schema({
    },
 
    messages: {
-    type :  [Map], 
+    type :  [{
+      user: mongoose.Schema.Types.ObjectId,
+      message: String,
+      CreatedAt:{
+         type:Date,
+         default: Date.now()
+      }
+    }], 
    },
    createdAt:{
       type: Date,
       default: Date.now()
+      
    }
 
 

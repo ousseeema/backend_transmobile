@@ -61,6 +61,7 @@ const tripModel = mongoose.Schema({
     default : Date.now()
   },
 
+  
 });
 
 

@@ -446,7 +446,7 @@ exports.getVerified = asyncHandler(async(req, res ,next)=>{
 exports.updateTrip = asyncHandler(async(req, res, next) => {
   
   const updatedTrip = await tripModel.findByIdAndUpdate(req.params.id, 
-    req.body,
+    {Citys: req.body},
     { 
       runvalidate : true,
       new :true
@@ -652,5 +652,35 @@ exports.Contactadmin= asyncHandler(async(req, res, next)=>{
   })
 
 });
+exports.getCurrentTransporter=asyncHandler(async(req, res, next)=>{
+  return res.status(200).send({
+    success: true,
+    message: "Current transporter",
+    data: req.user
+  })
+});
+exports.getCurrentTrip = asyncHandler(async(req, res, next)=>{
+ 
+    const currentTrip = await tripModel.find({
+      transporter: req.user.id,
+      isDone: false
+    });
+    if(!currentTrip){
+      return res.status(404).send({
+        data: [],
+        success : false , 
+        
+        message : "No Trip found for this transporter"
+      });
+    }
 
+    return res.status(200).send({
+      data: currentTrip,
+      success : true , 
+      message : "found a  trip",
+      len : currentTrip.length
+    });
+
+
+});
  

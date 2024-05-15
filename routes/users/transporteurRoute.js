@@ -3,7 +3,7 @@ const router = express.Router();
 const {protect} = require('../../middleware/authmid')
 const transporteur= require("../../model/transportorModel")
 
-const { gethistorylist, addTrip,addTripToHistory, updateTrip,deleteTrip,addSinglePackage , updateUserDetails,uploadProfilePicture, acceptDemande, refusedemande,getAllPackage_forSingleTrip, getAlldemande }= require("../../controller/transporteurController")
+const { getCurrentTrip,getCurrentTransporter, gethistorylist, addTrip,addTripToHistory, updateTrip,deleteTrip,addSinglePackage , updateUserDetails,uploadProfilePicture, acceptDemande, refusedemande,getAllPackage_forSingleTrip, getAlldemande }= require("../../controller/transporteurController")
 // working
 router.route("/transsendreclamation").put(protect(transporteur), updateUserDetails);
 //working
@@ -30,6 +30,16 @@ router.route("/addSinglepackage/:id").put(protect(transporteur), addSinglePackag
 router.route("/getAlltrips").get(protect(transporteur),gethistorylist );
 // working
 router.route("/addtriptohistory/:id").put(protect(transporteur),addTripToHistory);
+
+// working 
+router.route("/getCurrentTransporter").get(protect(transporteur), getCurrentTransporter);
+//working 
+router.route("/getCurrentTrip").get(protect(transporteur), getCurrentTrip);
+
+
+
+
+
 module.exports = router ;
 
 

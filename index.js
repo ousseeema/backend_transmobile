@@ -71,6 +71,7 @@ connectDB();
 // port number
 const PORT = 3000;
 
+
 const ipAddress = '192.168.100.20';
 // serveur connecting 
  const server =app.listen(PORT, ipAddress,() => {
@@ -82,12 +83,11 @@ const io = require('socket.io')(server);
 
 
 
+
 const MessageModel=require('./model/messageModel');
 
-
-
-
 // connecting to the socket server
+
 
 io.on('connection',(socket)=>{
   console.log('Connected', socket.id.magenta);

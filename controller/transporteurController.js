@@ -451,7 +451,7 @@ exports.updateTrip = asyncHandler(async(req, res, next) => {
       runvalidate : true,
       new :true
   
-    });
+    }, ).populate("transporter");
     if(!updatedTrip){
       return res.status(404).send({
         message : "error while updating the trip",
@@ -661,15 +661,15 @@ exports.getCurrentTransporter=asyncHandler(async(req, res, next)=>{
 });
 exports.getCurrentTrip = asyncHandler(async(req, res, next)=>{
  
-    const currentTrip = await tripModel.find({
+    const currentTrip = await tripModel.findOne({
       transporter: req.user.id,
       isDone: false
-    });
+    }).populate("transporter");
     if(!currentTrip){
       return res.status(404).send({
-        data: [],
-        success : false , 
-        
+       
+        data: null,
+        success : false ,        
         message : "No Trip found for this transporter"
       });
     }
@@ -678,7 +678,7 @@ exports.getCurrentTrip = asyncHandler(async(req, res, next)=>{
       data: currentTrip,
       success : true , 
       message : "found a  trip",
-      len : currentTrip.length
+     
     });
 
 

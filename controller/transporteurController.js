@@ -5,6 +5,9 @@ const tripModel =require('../model/tripModel');
 const demandeDelv = require('../model/demandeDelv');
 const path = require("path");
 const historymodel = require("../model/historyTrip");
+const MessageModel = require ("../model/messageModel");
+
+const mongoose = require('mongoose');
 
 // updating user data name email
 
@@ -185,7 +188,7 @@ exports.addTrip = asyncHandler(async(req, res, next) => {
     return res.status(203).send({
       status : "fail",
       success : false ,
-      message : 'You cannot add trip twice',
+      message : 'error while adding the trip due to missings fileds',
     })
 
     
@@ -195,7 +198,8 @@ exports.addTrip = asyncHandler(async(req, res, next) => {
  return res.status(200).send({
     success : true , 
     status: "success", 
-    message : "You have posted a trip successfuly"
+    message : "You have posted a trip successfuly",
+   
   });
 
 
@@ -275,7 +279,7 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
  const addPackageTo_theTrip = await tripModel.findByIdAndUpdate(
   req.user.id,{
   $push : {packages : demandeaccepte},
-  $inc : {numberofpackage :1}
+  $inc : {numberofpackage :1, }
  },{
   isDone : false,
  }
@@ -445,32 +449,41 @@ exports.getVerified = asyncHandler(async(req, res ,next)=>{
 // update trip
 exports.updateTrip = asyncHandler(async(req, res, next) => {
   
-  const updatedTrip = await tripModel.findByIdAndUpdate(req.params.id, 
-    {Citys: req.body},
-    { 
-      runvalidate : true,
-      new :true
-  
-    }, ).populate("transporter");
-    if(!updatedTrip){
-      return res.status(404).send({
-        message : "error while updating the trip",
-        success : false,
-        status : "fail",
-        data :[]
-      });
+  const citysData = req.body.Citys;
+
+  // Ensure each entry in Citys has a valid _id
+  citysData.forEach(city => {
+    if (!city._id || !mongoose.Types.ObjectId.isValid(city._id)) {
+      city._id = new mongoose.Types.ObjectId();
     }
+  });
 
+  const updatedTrip = await tripModel.findByIdAndUpdate(
+    req.params.id,
+    { Citys: citysData },
+    {
+      runValidators: true,
+      new: true
+    }
+  ).populate("transporter");
 
-    return res.status(200).send({
-      message : "trip updated successfuly",
-      success : true,
-      status : "success",
-      data : updatedTrip
+  if (!updatedTrip) {
+    return res.status(404).send({
+      message: "Error while updating the trip",
+      success: false,
+      status: "fail",
+      data: []
     });
+  }
 
-
+  return res.status(200).send({
+    message: "Trip updated successfully",
+    success: true,
+    status: "success",
+    data: updatedTrip
+  });
 });
+
 
 
 // delete the current trip 
@@ -500,9 +513,9 @@ exports.addSinglePackage = asyncHandler(async(req, res, next)=>{
     
   //! add a default photo to the package beacuse the transporter 
   //!is the one that add this package with no photo
-      req.body.packageohoto = "default.png";
+      req.body.packagephoto = "default.png";
   const package = await tripModel.findByIdAndUpdate(req.params.id,{
-    $push : {packages : req.body},
+    $push : {self_packages : req.body},
     $inc : {numberofpackage :1}
    });
 
@@ -515,10 +528,10 @@ exports.addSinglePackage = asyncHandler(async(req, res, next)=>{
       });
     }
     //! calculate the revenu of the package and add to the data base
-    const amount =  req.user.price_kg * req.body.numberofkg;
+    
     const transporterupdate = await transporteur.findByIdAndUpdate(req.user.id,
       {
-        $inc :{numberofPackages : 1, numberofClients : 1, totalRevenue: amount}
+        $inc :{ numberofPackages:1,numberofClients : 1, totalRevenue: req.body.amount}
 
       });
       if(!transporterupdate){
@@ -529,6 +542,7 @@ exports.addSinglePackage = asyncHandler(async(req, res, next)=>{
           data:[]
         })
       }
+      
 
 
     return res.status(200).send({
@@ -669,7 +683,7 @@ exports.getCurrentTrip = asyncHandler(async(req, res, next)=>{
       return res.status(404).send({
        
         data: null,
-        success : false ,        
+        success : true ,        
         message : "No Trip found for this transporter"
       });
     }
@@ -683,4 +697,25 @@ exports.getCurrentTrip = asyncHandler(async(req, res, next)=>{
 
 
 });
- 
+
+
+ // getting all message for  the specific user 
+exports.getListofMessage = asyncHandler(async(req, res, next)=>{
+  const ListOfMessage = await MessageModel.find({
+    transporteur : req.user.id
+  }).populate("clientId") ;
+  if(!ListOfMessage){
+    return res.status(404).send({
+      message: "error getting message", 
+      success: false,
+      data:[]
+    });
+  }
+  
+
+  return res.status(200).send({
+    message: "Done getting messages", 
+    success: true,
+    data:ListOfMessage
+  });
+});

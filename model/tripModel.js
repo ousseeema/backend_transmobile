@@ -3,15 +3,16 @@ const mongoose = require("mongoose");
 
 const City = mongoose.Schema({
   city:{
+    _id:mongoose.Types.ObjectId,
     type: String,
     required: true,
     trim: true,
   },
-  dateofpassage: Date,
+  dateofpassage: String,
   Done:{
     type : Boolean,
     default : false,
-    required : true
+    
   }
 });
 
@@ -48,6 +49,11 @@ const tripModel = mongoose.Schema({
   },
 
   packages :{
+    type : Array,
+    default : [],
+    
+  },
+  self_packages :{
     type : Array,
     default : [],
     

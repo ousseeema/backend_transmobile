@@ -18,6 +18,7 @@ const messageModel = mongoose.Schema({
     type :  [{
       user: mongoose.Schema.Types.ObjectId,
       message: String,
+      
       CreatedAt:{
          type:Date,
          default: Date.now()

@@ -72,7 +72,7 @@ connectDB();
 const PORT = 3000;
 
 
-const ipAddress = '192.168.1.38';
+const ipAddress = '192.168.100.20';
 // serveur connecting 
  const server =app.listen(PORT, ipAddress,() => {
   console.log(`Server running on port ${PORT}`);
@@ -104,13 +104,13 @@ io.on('connection',(socket)=>{
 
    const existedDiscussion = await MessageModel.findOne({
     transporteur: message.transporteur,
-    clientId: message.user
-  }).populate('transporteur');
+    clientId: message.client
+  }).populate('transporteur clientId');
   
   if (!existedDiscussion) {
     // Create a new discussion and add the message
     const newDiscussion = new MessageModel({
-      clientId: message.user,
+      clientId: message.client,
       transporteur: message.transporteur,
       messages: [
         {
@@ -121,7 +121,7 @@ io.on('connection',(socket)=>{
       ]
       
     });
-    await newDiscussion.populate("transporteur");
+    await newDiscussion.populate("transporteur clientId");
   
     await newDiscussion.save();
     
@@ -150,6 +150,65 @@ io.on('connection',(socket)=>{
    
 
   });
+
+
+
+  // transporter send message 
+  socket.on('TransporterSendMessage',async (message)=>{
+  
+
+
+
+       
+
+    const existedDiscussion = await MessageModel.findOne({
+     transporteur: message.transporteur,
+     clientId: message.client
+   }).populate('transporteur clientId');
+   
+   if (!existedDiscussion) {
+     // Create a new discussion and add the message
+     const newDiscussion = new MessageModel({
+       clientId: message.client,
+       transporteur: message.transporteur,
+       messages: [
+         {
+           user: message.user,
+           message: message.message,
+          
+         }
+       ]
+       
+     });
+     await newDiscussion.populate("transporteur clientId");
+   
+     await newDiscussion.save();
+     
+     socket.emit("TransporterMessage-received", newDiscussion );
+    
+     socket.to(message.client).emit("TransporterMessage-received", newDiscussion);
+   } else {
+     // Update the existing discussion with the new message
+     existedDiscussion.messages.push({
+       user: message.user,
+       message: message.message,
+       
+     });
+       
+     await existedDiscussion.save();
+      socket.emit("TransporterMessage-received", existedDiscussion);
+      
+ 
+     socket.to(message.client).emit("TransporterMessage-received", existedDiscussion);
+   }
+ 
+ 
+ 
+ 
+ 
+    
+ 
+   });
 
 
 })

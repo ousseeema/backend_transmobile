@@ -1,5 +1,5 @@
 const errorhandler = (err,req, res, next) => {
-  console.log(err);
+  console.log(err.message);
   if (err.name === "CastError") {
     res.status(400).send({ message: ` resource not found ` });
   }

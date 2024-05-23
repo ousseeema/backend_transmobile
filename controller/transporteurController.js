@@ -136,6 +136,7 @@ const file = req.files.file;
 // add trip annonce 
 
 exports.addTrip = asyncHandler(async(req, res, next) => {
+  console.log(req.body);
 // test if the transporter has already been added a trip 
   const test = await tripModel.findOne(
    {transporter: req.user.id,
@@ -174,21 +175,23 @@ exports.addTrip = asyncHandler(async(req, res, next) => {
           success : false,  
           message : "error while adding the the trip due to missings fileds",
           data:[],
-          
-
         });
       }
-    const trip= await tripModel(req.body);
-    trip.save({
-      runvalidate : true,
+    const trip= await tripModel({
+      transporter: req.user.id,
+      Citys: req.body.Citys,
+      Home_pick_up : req.body.home_pick_up,
+      Home_delivery : req.body.Home_delivery
     });
+    trip.save();
+    
 
   
   if(!trip){
     return res.status(203).send({
       status : "fail",
       success : false ,
-      message : 'error while adding the trip due to missings fileds',
+      message : 'error while adding the trip',
     })
 
     
@@ -446,6 +449,7 @@ exports.getVerified = asyncHandler(async(req, res ,next)=>{
 
 
 
+
 // update trip
 exports.updateTrip = asyncHandler(async(req, res, next) => {
   
@@ -457,6 +461,7 @@ exports.updateTrip = asyncHandler(async(req, res, next) => {
       city._id = new mongoose.Types.ObjectId();
     }
   });
+
 
   const updatedTrip = await tripModel.findByIdAndUpdate(
     req.params.id,

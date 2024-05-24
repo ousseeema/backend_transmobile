@@ -89,6 +89,7 @@ const userModel = mongoose.Schema({
     default : "default.png"
   },
 
+
   resetToken : {
     type : String,
     required : false,

@@ -3,7 +3,7 @@ const router = express.Router();
 const {protect} = require('../../middleware/authmid')
 const transporteur= require("../../model/transportorModel")
 
-const {getListofMessage, getCurrentTrip,getCurrentTransporter, gethistorylist, addTrip,addTripToHistory, updateTrip,deleteTrip,addSinglePackage , updateUserDetails,uploadProfilePicture, acceptDemande, refusedemande,getAllPackage_forSingleTrip, getAlldemande }= require("../../controller/transporteurController")
+const {getAllVerifiedDemande, getVerified,Contactadmin ,getListofMessage, getCurrentTrip,getCurrentTransporter, gethistorylist, addTrip,addTripToHistory, updateTrip,deleteTrip,addSinglePackage , updateUserDetails,uploadProfilePicture, acceptDemande, refusedemande,getAllPackage_forSingleTrip, getAlldemande }= require("../../controller/transporteurController")
 // working
 router.route("/transsendreclamation").put(protect(transporteur), updateUserDetails);
 //working
@@ -37,6 +37,14 @@ router.route("/getCurrentTransporter").get(protect(transporteur), getCurrentTran
 router.route("/getCurrentTrip").get(protect(transporteur), getCurrentTrip);
 // working
 router.route("/getListofMessage").get(protect(transporteur), getListofMessage);
+// working 
+router.route("/contactAdmin").post(protect(transporteur), Contactadmin);
+//working 
+router.route("/Getverified").post(protect(transporteur), getVerified);
+
+//working 
+router.route("/getallverifictionDemande").get(protect(transporteur), getAllVerifiedDemande);
+
 
 
 

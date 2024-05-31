@@ -378,9 +378,9 @@ exports.getAllPackage_forSingleTrip = asyncHandler(async(req, res ,next)=>{
 exports.getVerified = asyncHandler(async(req, res ,next)=>{
 
   // testing the input file and data 
-  const {fullname , CIN , message, } = req.body;
+  const {fullname  , message, } = req.body;
 
-  if(!name || !fullname|| !message){
+  if( !fullname|| !message){
     return res.status(400).send({
       message : "Please enter your information or message ",
       status : "fail", 
@@ -442,13 +442,11 @@ exports.getVerified = asyncHandler(async(req, res ,next)=>{
       success : true , 
       status : "success",
       data :[],
-    });
-
-
+      
 });
 
 
-
+});
 
 // update trip
 exports.updateTrip = asyncHandler(async(req, res, next) => {
@@ -723,4 +721,25 @@ exports.getListofMessage = asyncHandler(async(req, res, next)=>{
     success: true,
     data:ListOfMessage
   });
+});
+exports.getAllVerifiedDemande= asyncHandler(async(req, res, next)=>{
+
+  const Listdemandes = await verifiedDemande.find({userId :req.user.id});
+    
+
+  if(!Listdemandes){
+    return res.status(404).send({
+      success: false,
+      message : "user has no demande for the moment",
+      data:[]
+    });
+  }
+
+  return res.status(200).send({
+    success: true,
+    message :"Done Getting the list of demandes",
+      data:Listdemandes
+  })
+
+
 });

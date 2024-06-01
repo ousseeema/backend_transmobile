@@ -12,49 +12,82 @@ const mongoose = require('mongoose');
 // updating user data name email
 
 exports.updateUserDetails= asyncHandler(async(req, res , next) => {
-    if(!req.body){
-      return res.status(404).send({
-        message : "please enter your info",
-        success : false,
-        data:[]
-      })
+
+  let request = JSON.parse(req.body.data);
+  // *! if the user has sent a pic to update
+
+  if (req.files && req.files.file) {
+    const file = req.files.file;
+    //  check the   image size
+    if (file.size > 1000000) {
+      return res.status(400).send({
+        success: false,
+        message: "File size should not exceed 1MB",
+        data: [],
+      });
     }
-   
-   if(req.body.password){
+
+    // if the user have a profile picture already delete it from the serveur
+    if (req.user.profilePicture !== "default.jpg") {
+      fs.unlink(`./Images/private/transporteurs/${req.user.profilePicture}`, (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(400).send({
+            success: false,
+            message: "error updating  picture",
+            data: [],
+          });
+        }
+      });
+    }
+
+    // upload the new profile picture on the serveur
+    file.name = `transporteurs_${req.user.id}${path.parse(file.name).ext}`;
+    file.mv(`./Images/private/transporteurs/${file.name}`);
+
+    // updating the new profile picture in the database
+    const user = await transporteur.findByIdAndUpdate(
+      req.user.id,
+      { profilePicture: file.name },
+      {
+        runvalidate: true,
+        new: true,
+      }
+    );
+    if (!user) {
+      return res.status(400).send({
+        success: false,
+        message: "error updating profile picture",
+        data: [],
+      });
+    }
+  }
+
+  if (request.password) {
     return res.status(400).send({
-      success : false ,
-      message : "You can't update password from here",
-      data : []
+      success: false,
+      message: "You can't update password from here",
+      data: [],
     });
-   }
-  
- 
+  }
 
+  const finaluser = await transporteur.findByIdAndUpdate(req.user.id, request, {
+    runvalidate: true,
+    new: true,
+  });
 
-  
-  const transporter = await transporteur.findByIdAndUpdate(req.user.id,
-    req.body,
-    {
-      runvalidate : true , 
-
-      new : true});
-
-  if(!transporter){
-
+  if (!finaluser) {
     return res.status(404).send({
-      success : false ,
-      message : "transporteur not found",
-      data : []
+      success: false,
+      message: "User not found",
+      data: [],
     });
-
-
   }
   return res.status(200).send({
-    success : true ,
-    message : "transporteur information updated successfully",
-    data : transporter
-  })
-
+    success: true,
+    message: "User updated successfully",
+    data: finaluser,
+  });
 
 });
 
@@ -742,4 +775,95 @@ exports.getAllVerifiedDemande= asyncHandler(async(req, res, next)=>{
   })
 
 
+});
+
+
+// change the password of the transporteur 
+exports.changepasword = asyncHandler(async (req, res, next) => {
+  const { oldpassword, newpassword } = req.body;
+
+  if (!oldpassword || !newpassword) {
+    return res.status(404).send({
+      success: false,
+      message: "try sending valid  data",
+      data: [],
+    });
+  }
+
+  const user = await transporteur.findById(req.user.id).select("+password");
+
+  if (!user) {
+    return res.statud(404).send({
+      success: false,
+      message: "user not found",
+      data: [],
+    });
+  }
+
+  const isMatched = user.matchPassword(oldpassword);
+
+  if (!isMatched) {
+    return res.status(404).send({
+      success: false,
+      message: "password isn t correct ",
+    });
+  }
+
+  try {
+    user.password = newpassword;
+    user.save();
+    return res.status(200).send({
+      success: true,
+      message: "user updated successfully",
+    });
+  } catch (e) {
+    return res.status(200).send({
+      success: true,
+      message: "ops faild to update password",
+    });
+  }
+});
+// change transporteur email address
+
+exports.checkemailBeforechange = asyncHandler(async (req, res, next) => {
+  const email = req.body.email;
+
+  if (!email) {
+    return res.status(404).send({
+      success: false,
+      message: "you must provide us with an email",
+      data: [],
+    });
+  }
+
+  //! searching for a user that  have the same email
+  const user = await transporteur.findOne({ email: email });
+  //! if there are a user with the same email then return error
+  if (user) {
+    return res.status(200).send({
+      success: false,
+      message: "user with the same email exists already",
+      data: [],
+    });
+  }
+  //! if there are no users with the same email update the user email
+
+  const userupdated = await transporteur.findByIdAndUpdate(
+    req.user.id,
+    { email: email },
+    { new: true }
+  );
+
+  if (!userupdated) {
+    return res.status(404).send({
+      success: false,
+      message: "user exists with the same email",
+      data: [],
+    });
+  }
+  return res.status(200).send({
+    success: true,
+    message: "user updated successfully",
+    data: userupdated,
+  });
 });

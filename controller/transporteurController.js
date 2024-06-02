@@ -857,7 +857,7 @@ exports.checkemailBeforechange = asyncHandler(async (req, res, next) => {
   if (!userupdated) {
     return res.status(404).send({
       success: false,
-      message: "user exists with the same email",
+      message: "error updating information",
       data: [],
     });
   }

@@ -18,7 +18,7 @@ const historytrip = mongoose.Schema({
 
   transporter :{
     type:mongoose.Schema.Types.ObjectId,
-   ref :"transpoteur"
+   ref :"transporteur"
   },
   
   Citys :{
@@ -40,6 +40,11 @@ const historytrip = mongoose.Schema({
   },
 
   packages :{
+    type : Array,
+    default : [],
+    
+  },
+  self_packages :{
     type : Array,
     default : [],
     

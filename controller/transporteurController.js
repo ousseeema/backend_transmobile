@@ -607,6 +607,7 @@ const trip = await tripModel.findByIdAndUpdate(req.params.id,
       data:[]
 
     });
+
   }
   
 
@@ -616,6 +617,7 @@ const trip = await tripModel.findByIdAndUpdate(req.params.id,
     Home_pick_up: trip.Home_pick_up,  
     Home_delivery: trip. Home_delivery , 
     packages: trip.packages ,
+    self_packages :trip.self_packages,
     isDone: trip.isDone ,
     createdAt : trip.createdAt
   });
@@ -631,7 +633,12 @@ const trip = await tripModel.findByIdAndUpdate(req.params.id,
    }
 
 
-   const deletetrip = await tripModel.findByIdAndDelete(req.params.id);
+   const deletetrip = await tripModel.findOneAndDelete(
+    {
+      transporter: req.user.id,
+      
+    }
+  );
    if(!deletetrip){
     return res.status(404).send({
       message : " error while deleting trip but add to the history list"
@@ -654,7 +661,7 @@ const trip = await tripModel.findByIdAndUpdate(req.params.id,
   exports.gethistorylist = asyncHandler(async(req, res, next)=>{
      const listofTrip = await historymodel.find({
       transporter: req.user.id
-     });
+     }).populate("transporter",);
      if(!listofTrip){
       return res.status(404).send({
         success : false, 

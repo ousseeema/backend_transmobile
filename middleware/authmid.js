@@ -40,6 +40,7 @@ exports.protect = (model)=> asynchandller(async(req, res, next)=>{
 
 
     req.user = user ;
+    
     next();
 
 

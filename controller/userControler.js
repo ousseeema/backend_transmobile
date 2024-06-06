@@ -12,6 +12,7 @@ const transportorModel = require("../model/transportorModel");
 const verifiedDemande = require("../model/verifiedDemande");
 const ContactAdmin = require("../model/ContactAdmin");
 const MessageModel = require('../model/messageModel');
+const { default: mongoose } = require("mongoose");
 // updating user data name email
 
 exports.updateUserDetails = asyncHandler(async (req, res, next) => {
@@ -386,8 +387,7 @@ exports.getalldemande = asyncHandler(async (req, res, next) => {
     populate: {
       path: "comments.user" // Populate the 'user' field in the 'comments' array
     }
-  });
-
+  }).populate('Client');
 
 
   if (!demandes) {
@@ -413,16 +413,22 @@ exports.getalldemande = asyncHandler(async (req, res, next) => {
 
 exports.getCurrentTrips = asyncHandler(async (req, res, next) => {
   //! getting current trips that user has been accepted for them
-
+  
   const currentTrips = await tripModel.find({
     packages: {
       $elemMatch: {
-        Client: req.user.id,
+        Client: new mongoose.Types.ObjectId(req.user.id), // Assuming Client is an ObjectID reference
       },
     },
     isDone: false,
+  }).populate({
+    path: "transporter",
+    populate: {
+      path: "comments.user",
+    },
   });
-
+    
+  console.log(currentTrips);
   if (!currentTrips) {
     return res.status(404).send({
       success: false,
@@ -582,7 +588,7 @@ exports.Contactadmin= asyncHandler(async(req, res, next)=>{
 exports.getListofMessage = asyncHandler(async(req, res, next)=>{
   const ListOfMessage = await MessageModel.find({
     clientId: req.user.id
-  }).populate("transporteur") ;
+  }).populate("transporteur").populate('clientId') ;
   if(!ListOfMessage){
     return res.status(404).send({
       message: "error getting message", 

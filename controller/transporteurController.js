@@ -6,7 +6,8 @@ const demandeDelv = require('../model/demandeDelv');
 const path = require("path");
 const historymodel = require("../model/historyTrip");
 const MessageModel = require ("../model/messageModel");
-
+const verified= require('../model/verifiedDemande');
+const ContactAdmin =require('../model/ContactAdmin');
 const mongoose = require('mongoose');
 
 // updating user data name email
@@ -247,9 +248,12 @@ exports.addTrip = asyncHandler(async(req, res, next) => {
 exports.getAlldemande = asyncHandler(async(req, res, next) => {
 
  const alldemandes = await demandeDelv.find(
-  {transporter : req.user.id}
+  {
+    transporter : req.user.id
+  }
 
-  ).populate('Client');
+  ).populate(
+    'Client').populate('transporter');
    if(!alldemandes){
 
     return res.status(403).send({
@@ -292,9 +296,13 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
    data :[]
   });
  }
+ 
+ //convert the number and the price to numbers
+ const numberofkg = parseFloat(demandeaccepte.message.numberofkg);
+  const price_kg = parseFloat(req.user.price_kg);
 
    // ! calculating the amount and adding it to the transporter revenu 
-   const amount = demandeaccepte.numberofkg * req.user.price_kg;
+const amount = numberofkg * price_kg;
 
 
 
@@ -312,16 +320,14 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
    }
 
 // adding the package to the trip
- const addPackageTo_theTrip = await tripModel.findByIdAndUpdate(
-  req.user.id,{
-  $push : {packages : demandeaccepte},
-  $inc : {numberofpackage :1, }
- },{
-  isDone : false,
- }
- 
- 
- );
+const addPackageTo_theTrip = await tripModel.findOneAndUpdate(
+  { transporter: req.user.id, isDone: false },
+  {
+    $push: { packages: demandeaccepte },
+    $inc: { numberofpackage: 1 }
+  },
+  { new: true } // To return the updated document
+);
 
 
 
@@ -338,7 +344,7 @@ exports.acceptDemande = asyncHandler(async(req, res, next)=>{
     message : "demande accepted and package add to the List successfuly",
     success : true,
     status :"success",
-    data : addPackageTo_theTrip
+    data : []
   });
 });
 
@@ -409,74 +415,63 @@ exports.getAllPackage_forSingleTrip = asyncHandler(async(req, res ,next)=>{
 
 
 exports.getVerified = asyncHandler(async(req, res ,next)=>{
+    console.log(req.body.data);
+  if (!req.body.data) {
+    return res.status(404).send({
+      message: "please enter your info",
+      success: false,
+      data: [],
+    });
+  }
+  //! convert the req to an object because it came in String format
+  let result = JSON.parse(req.body.data);
+  //! adding the client id to the object
+  result.userId = req.user.id;
 
-  // testing the input file and data 
-  const {fullname  , message, } = req.body;
+  const file = req.files.file;
 
-  if( !fullname|| !message){
-    return res.status(400).send({
-      message : "Please enter your information or message ",
-      status : "fail", 
-      success : false ,
-      data :[],
+  if (!file) {
+    return res.status(404).send({
+      message: "Please add a image of your passport ",
+      success: false,
+      data: [],
+      status: "fail",
+    });
+  }
+  if (file.size > 1000000) {
+    return res.status(404).send({
+      message: "image of your passport must be under 1MB ",
+      success: false,
+      data: [],
+      status: "fail",
+    });
+  }
+  const twelveDigitNumber = Math.floor(1000000000 + Math.random() * 900000000000);
+
+  file.name = `passport_${twelveDigitNumber}${path.parse(file.name).ext}`;
+
+  //! then adding the image name to the ressult of tthe convert
+  result.passport_image = file.name;
+  //! move the image to the directory
+  file.mv(`./Images/passport/${file.name}`);
+
+  const demandeVerified = await verified.create(result);
+
+  if (!demandeVerified) {
+    return res.status(404).send({
+      message: "Error while creating the request",
+      success: false,
+      status: "fail",
+      data: [],
     });
   }
 
-
-  const passport_image = req.files.file;
-
-
-  if(!passport_image){
-     return res.status(404).send({
-      message : "Please add a image of your passport ",
-      success : false ,
-      data :[],
-      status : "fail"
-     });
-
-
-  }
-  if(file.mimetype.startsWith('image')){
-    return res.status(404).send({
-      message : "Please add a image of your passport ",
-      success : false ,
-      data :[],
-      status : "fail"
-     });
-
-  }
-  if(file.size>1000000){
-    return res.status(404).send({
-      message : "image of your passport must be under 1MB ",
-      success : false ,
-      data :[],
-      status : "fail"
-     });
-  }
-
- file.name = `passport_${req.user.id}${path.parse(file.name).ext}`
-  req.body.passport_image = file.name;
-
-  file.mv(`./Images/passport/${file.name}`);
-
-  const demandeVerified = await verifiedModel.create(req.body);
-
-    if(!demandeVerified){
-      return res.status(404).send({
-        message: "Error while creating the request",
-        success : false, 
-        status : "fail",
-        data:[]
-      });
-    }
-
-    return res.status(200).send({
-      message : "Your request has been sended to the admins ",
-      success : true , 
-      status : "success",
-      data :[],
-      
-});
+  return res.status(200).send({
+    message: "Your request has been sended to the admins ",
+    success: true,
+    status: "success",
+    data: [],
+  });
 
 
 });
@@ -746,7 +741,7 @@ exports.getCurrentTrip = asyncHandler(async(req, res, next)=>{
 exports.getListofMessage = asyncHandler(async(req, res, next)=>{
   const ListOfMessage = await MessageModel.find({
     transporteur : req.user.id
-  }).populate("clientId") ;
+  }).populate("clientId").populate('transporteur') ;
   if(!ListOfMessage){
     return res.status(404).send({
       message: "error getting message", 
@@ -764,7 +759,7 @@ exports.getListofMessage = asyncHandler(async(req, res, next)=>{
 });
 exports.getAllVerifiedDemande= asyncHandler(async(req, res, next)=>{
 
-  const Listdemandes = await verifiedDemande.find({userId :req.user.id});
+  const Listdemandes = await verified.find({userId :req.user.id});
     
 
   if(!Listdemandes){

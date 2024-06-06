@@ -4,6 +4,7 @@ const { protect } = require("../../middleware/authmid");
 const transporteur = require("../../model/transportorModel");
 
 const {
+  
   checkemailBeforechange,
   changepasword,
   getAllVerifiedDemande,
@@ -63,6 +64,7 @@ router.route("/getAlltrips").get(protect(transporteur), gethistorylist);
 router
   .route("/addtriptohistory/:id")
   .put(protect(transporteur), addTripToHistory);
+
 
 // working
 router

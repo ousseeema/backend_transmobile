@@ -29,8 +29,8 @@ const deletePlanifier = require("./utils/deletePlanifie");
 // importing user model and transporteur model
 const userModel = require('./model/userModel');
 const transportModel = require('./model/transportorModel');
-//deletePlanifier(userModel);
-//deletePlanifier(transportModel);
+deletePlanifier(userModel);
+deletePlanifier(transportModel);
 
 
 
@@ -65,17 +65,18 @@ app.use(errorMiddleware);
 
 
 
-
 // connecting to the database
 connectDB();
+
 // port number
 const PORT = 3000;
 
-const ipAddress = '192.168.43.36';
+const ipAddress = '192.168.1.22';
 // serveur connecting 
  const server =app.listen(PORT, ipAddress,() => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 const io = require('socket.io')(server);

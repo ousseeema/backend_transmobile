@@ -428,7 +428,7 @@ exports.getCurrentTrips = asyncHandler(async (req, res, next) => {
     },
   });
     
-  console.log(currentTrips);
+  
   if (!currentTrips) {
     return res.status(404).send({
       success: false,
@@ -437,6 +437,7 @@ exports.getCurrentTrips = asyncHandler(async (req, res, next) => {
       data: [],
     });
   }
+  
 
   //! sending the data to the user ui
   return res.status(200).send({
@@ -609,4 +610,32 @@ exports.getCurrentUser=asyncHandler(async(req, res, next)=>{
     message: "Current user",
     data: req.user
   })
-})
+});
+exports.getspecifiqueMesssage = asyncHandler(async(req, res, next)=>{
+
+
+  const transporteurId = req.params.id;
+
+
+  const specifiqueMesssage =  await MessageModel.findOne({
+    transporteur: transporteurId,
+    clientId: req.user.id
+  }).populate("transporteur").populate("clientId");
+
+  if(!specifiqueMesssage) {
+    return res.status(404).send({
+      message: 'no message available between client and this transport',
+      success: false,
+      data :[],
+    });
+  }
+
+  return res.status(200).send({ 
+    message: "message available",
+    success: true,
+    data: specifiqueMesssage,
+
+  })
+
+
+});

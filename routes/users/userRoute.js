@@ -10,7 +10,7 @@ const {
   getallverificationdemandes,
   checkemailBeforechange,
   changepasword,
-
+  getspecifiqueMesssage,
   getallTrips,
   addReview,
   getalldemande,
@@ -58,4 +58,7 @@ router
 
 // working
 router.route("/getcurrentuser").get(protect(usermodel), getCurrentUser);
+// working
+router.route("/getspecifiqueMesssage/:id").get(protect(usermodel), getspecifiqueMesssage);
+
 module.exports = router;

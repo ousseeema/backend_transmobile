@@ -9,7 +9,7 @@ const MessageModel = require ("../model/messageModel");
 const verified= require('../model/verifiedDemande');
 const ContactAdmin =require('../model/ContactAdmin');
 const mongoose = require('mongoose');
-
+const {sendNotifcationToDevice}= require("../controller/pushNotificationController")
 // updating user data name email
 
 exports.updateUserDetails= asyncHandler(async(req, res , next) => {
@@ -519,8 +519,42 @@ exports.updateTrip = asyncHandler(async(req, res, next) => {
 
 // delete the current trip 
 exports.deleteTrip = asyncHandler(async(req, res, next)=>{
-  const tripdeleted = await tripModel.findByIdAndDelete(req.params.id);
+  
+// first retiving all the user id that aere in the current trip AN DTHEN SEND 
+//  notification for the user to notify them aboutt the chanege that have been mad
+  const aggregationPipeline = [
+    {
+      $match: {
+        _id: req.params.id,
+      }
+    },
+    {
+      $unwind: "$packages"
+    },
+    {
+      $group: {
+        _id: null,
+        ClientIds: { $addToSet: "$packages.Client" }
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        ClientIds: 1
+      }
+    }
+  ];
 
+  const userInTheTrip = await tripModel.aggregate(aggregationPipeline);
+  
+  console.log(userInTheTrip);
+
+ // sending notification :
+     sendNotifcationToDevice(userInTheTrip);
+     
+   /// after sending notification to the user , delete the trip 
+  const tripdeleted = await tripModel.findByIdAndDelete(req.params.id);
+   
   if(!tripdeleted){
     return res.status(404).send({
       message : "error while deleting trip",

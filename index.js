@@ -55,8 +55,9 @@ app.use("/api/v0/authTransporteur", authTransporteurRoutes);
 // accessing photo from out side the application
 app.use("/Images/", express.static(path.join(__dirname,"Images"))) 
 
-
-
+// sending notification from the user to the others users 
+const sendNotification = require('./routes/notifications/notificationRoute');
+app.use("/api/v0/notifications", sendNotification );
 
 
  // error middleware import and use 
@@ -71,7 +72,7 @@ connectDB();
 // port number
 const PORT = 3000;
 
-const ipAddress = '192.168.100.20';
+const ipAddress = '192.168.1.93';
 
 // serveur connecting 
  const server =app.listen(PORT, ipAddress,() => {

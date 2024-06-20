@@ -235,7 +235,10 @@ const TransporteurModel = mongoose.Schema({
   comments :{
     type :[comment]
   },
-  
+   pushNotificationId :{
+    type :String,
+    required : false ,
+   }
 
  
 

@@ -124,7 +124,12 @@ const userModel = mongoose.Schema({
         of : mongoose.Schema.Types.Mixed
       }
     ]
-  }
+  },
+  pushNotificationId :{
+    type :String,
+    required : false ,
+   }
+
 
 
 });

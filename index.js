@@ -72,7 +72,7 @@ connectDB();
 // port number
 const PORT = 3000;
 
-const ipAddress = '192.168.1.93';
+const ipAddress = '192.168.100.20';
 
 // serveur connecting 
  const server =app.listen(PORT, ipAddress,() => {

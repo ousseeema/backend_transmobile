@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "transmobiile",
+  "private_key_id": "860a586975ffceeb9397b638fc7705d63efba0cf",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQChyMv1Y4q9Fc++\nNElk3hzeo86/c46WrvXqexUjtpjC+cGzTa+tJ/gFjjp2o3LrHXNkE5udrqAFITGx\nFQcrJP5P/+b68bwHOSQFxe4WKb/bAA5r7iiO/uv5nYfS8Op1kT1iCpf62TdrGcOX\nEJe4LVBhrR5y08eRDIPWSHHTtIuaVcd44z7XV1zn5/HU7+8fknxtwQqlIh8qxzYx\no2JeZglN9eKnvYbktr6R1VjeBPNRI55n+IchSPNV5eWf0wwnDZI5wmS1FDZDX2qE\nAw5y1Ed1W0Bv+LnqF1aaCwsa0zpevLpxv84iRy7XwqfkRYZzqy4XQfn74cJnsdmO\nQf7wezblAgMBAAECgf8XstItn+cyy38i3YXiwKZ59oTShprcd8SOFHmEQbse1HcL\nTNXvB2vNZIgr2MV8q1O71SN2dZ37ImGlDu994m1eSp4LJF3msPgV4Gh/1p3D9r4m\nETzftXfbmLfMrn2puxzCv8qDdE4p4hxEhKm00O51YGaVa3BQTwUA3pvN5ySL9skf\nc9c0YFZxnPzpMrrgr70XeMX31aXAwJ06xXPuMxv3bRspHr6VEs0LiiU3zek0xWiw\nLHaobGxIDtMhCG0Xp8VHHfLcf43PH7r4nNflNrpNFUGp7VNX3lxJm6lHdGcjl0wP\njYQ5Knb0O8GhbsYAsOdZP5hUu8HVWB7YuhSojdECgYEAz1Nx5FrGozjW1zQNnD+G\nO6TGTsR3ffaevwqSuVkH/hB3g5u7HFPKCkUggPQCAFmD2GZdYVhe+ZRNVFTGZyvC\n3FlNpeZ/KCQ2o4GzNbFBJ9QaRo/+Oxm8DZzHbumNixLNX9NIO1/6BT0aXfkO2NyI\nVHWCXQ3v3nKvMjS5sTvtdT0CgYEAx8Q+ZxFFV+zXixp+YALAXZsrcTHZoJs92kMn\nTuWbNnqxE1xiozYB+yupTZ9C7BGwDfbNT+T950pCgl0Wgf4mGVHdAzjCAcicj78d\n6cSZHB1s9MbVBYCGRIKZSwrvG+Ip0Qy35jUcF7gGbPr9TnU+y7UwozbLvfRReax+\nj1d5cskCgYAmrucdOGK/qadMWAYCFUgycLgfkkDJW+6arppZwube3Kuv/qqWynt0\nFxnNdbm53vnesprRwu9Vmfojtf2e2mdtPaxjO/KVxsv7DgQmDICfsc+FQvCojlCs\nKYh8hU9Hl6aCLqXXjjzUJWZ6CjJe/Cbju1kri6Ip2zQdJgFPtGLF8QKBgQC2V+YS\nFEy0lkak/XjvUHOgvduohjU9CZcq3HNL6/+CefmaT5Dlo42pY9A1PzNJ4ldOV8JO\ntBoi/cC52BiMbZz/LZ9MqolEMYbfGzdFw6Nya1WiFMArNobYkFE2k3Nwgz9iR3ax\nVjcfW2XaIjwHWrQII4qS4JiW+iVIp/AaDWGZKQKBgBfNzEqRZoxwPOzlmsK5km4S\n/UimLsdu4PVD/qwXUoywAwlJb3616cQzi4F0O4ku4rU8hv4eEruHmnhxS1KYLQFK\neJIzu1fgnDP5jAz1sbq8p8I3ZnlzHBceLzoddp+7uo+r1jDRYIDzN1iTxyJzosDd\noVmoAaZWzI3xVew1nIJy\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-71h4h@transmobiile.iam.gserviceaccount.com",
+  "client_id": "108005802867344007734",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-71h4h%40transmobiile.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
